@@ -1,0 +1,2104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Molar Mass Calculator & Full Periodic Table</title>
+<style>
+body { font-family: Arial,sans-serif; margin:0; background:#f4f4f4; color:#2c3e50;}
+header, footer { background:#2c3e50; color:white; text-align:center; padding:20px 0;}
+main { max-width:1200px; margin:auto; padding:20px; background:white; border-radius:8px;}
+h1,h2,h3{text-align:center;margin-bottom:10px;}
+section{margin:20px 0;}
+input,button{padding:8px;font-size:16px;border-radius:5px;border:1px solid #ccc;}
+button{cursor:pointer;background-color:#3498db;color:white;border:1px solid #2980b9;margin-left:10px;}
+button:hover{background-color:#2980b9;}
+#result,#breakdown,#elementInfo{padding:10px; border-radius:5px; background:#fefefe; margin-top:10px; display:none;}
+#periodicTableWrapper{overflow-x:auto;}
+#periodicTable{display:grid; grid-template-columns: repeat(18, 60px); gap:2px;}
+#periodicTable div{padding:12px 5px;text-align:center;cursor:pointer;border:1px solid #333;border-radius:4px;user-select:none;font-weight:bold; min-width:50px;}
+@media(max-width:600px){#periodicTable{grid-template-columns: repeat(6, 1fr);} input{width:100%; margin-bottom:10px;}}
+
+/* Reference Guide Styles */
+.reference-item {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  padding: 12px 15px;
+  border-radius: 8px;
+  border-left: 4px solid #3498db;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  transition: all 0.3s ease;
+  font-size: 0.95em;
+  line-height: 1.4;
+}
+
+.reference-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+}
+
+.referenceTab {
+  transition: all 0.3s ease;
+}
+
+.referenceTab:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.referenceTab.active {
+  transform: scale(1.05);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
+
+.referenceContent {
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* CSS Variables for Theming */
+:root {
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8f9fa;
+  --bg-tertiary: #e9ecef;
+  --bg-quaternary: #f1f3f4;
+  --bg-quinary: #e8f4fd;
+  --text-primary: #2c3e50;
+  --text-secondary: #6c757d;
+  --accent-color: #3498db;
+  --shadow-color: rgba(0,0,0,0.1);
+}
+
+[data-theme="dark"] {
+  --bg-primary: #1a1a1a;
+  --bg-secondary: #2d2d2d;
+  --bg-tertiary: #404040;
+  --bg-quaternary: #353535;
+  --bg-quinary: #1e3a5f;
+  --text-primary: #ffffff;
+  --text-secondary: #cccccc;
+  --accent-color: #4fc3f7;
+  --shadow-color: rgba(0,0,0,0.3);
+}
+
+/* Quick Tools Navigation Hover Effects */
+.quick-tools a:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+  background: rgba(255,255,255,1) !important;
+}
+
+/* Social Share Buttons */
+.social-share {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin: 20px 0;
+  flex-wrap: wrap;
+}
+
+.share-btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 25px;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+  font-size: 0.9em;
+}
+
+.share-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+
+.share-btn.facebook { background: #1877f2; }
+.share-btn.twitter { background: #1da1f2; }
+.share-btn.linkedin { background: #0077b5; }
+.share-btn.whatsapp { background: #25d366; }
+.share-btn.email { background: #ea4335; }
+</style>
+
+<!-- FAQ Schema JSON-LD for SEO -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is molar mass?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Molar mass is the mass of one mole of a substance, measured in grams per mole (g/mol). It's calculated by adding up the atomic masses of all atoms in a chemical formula. For example, H2O has a molar mass of 18.015 g/mol (2 × 1.008 + 15.999)."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How do you balance chemical equations?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Chemical equations are balanced by ensuring the same number of each type of atom appears on both sides. This is done by adjusting coefficients (numbers in front of formulas) while keeping the chemical formulas unchanged. The law of conservation of mass requires that atoms cannot be created or destroyed in chemical reactions."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What are the main gas laws in chemistry?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "The main gas laws include: Boyle's Law (P₁V₁ = P₂V₂), Charles's Law (V₁/T₁ = V₂/T₂), Gay-Lussac's Law (P₁/T₁ = P₂/T₂), and the Combined Gas Law (P₁V₁/T₁ = P₂V₂/T₂). The Ideal Gas Law (PV = nRT) combines all these relationships."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How do you calculate stoichiometry?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Stoichiometry calculations use balanced chemical equations to determine the relationships between reactants and products. Key calculations include: mole-to-mole conversions, mass-to-mass conversions, limiting reactant analysis, and percent yield calculations."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What is the periodic table?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "The periodic table is a tabular arrangement of chemical elements organized by atomic number, electron configuration, and recurring chemical properties. It contains 118 elements and is divided into periods (rows) and groups (columns) that show periodic trends in element properties."
+      }
+    }
+  ]
+}
+</script>
+
+<!-- Organization Schema for Chemistry Tools -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "Chemistry Tools",
+  "description": "Free online chemistry calculators and educational resources for students, educators, and professionals",
+  "url": "https://chemistrytools.com",
+  "logo": "https://chemistrytools.com/logo.png",
+  "sameAs": [
+    "https://github.com/chemistrytools"
+  ],
+  "contactPoint": {
+    "@type": "ContactPoint",
+    "contactType": "customer service",
+    "email": "support@chemistrytools.com"
+  },
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD",
+    "description": "Free chemistry tools and calculators"
+  }
+}
+</script>
+
+<!-- Breadcrumb Schema for SEO -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://chemistrytools.com"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Chemistry Tools",
+      "item": "https://chemistrytools.com#chemistry-tools"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "Online Calculators",
+      "item": "https://chemistrytools.com#calculators"
+    }
+  ]
+}
+</script>
+</head>
+<body>
+<!-- Sticky Navigation Bar -->
+<nav class="navbar">
+  <div class="nav-container">
+    <a href="#" class="nav-brand">🧪 Chemistry Tools</a>
+    <div class="nav-links">
+      <a href="#balancer" class="nav-link">⚖️ Balancer</a>
+      <a href="#molar-mass" class="nav-link">🧪 Molar Mass</a>
+      <a href="#stoichiometry" class="nav-link">🧮 Stoichiometry</a>
+      <a href="#gas-laws" class="nav-link">🌡️ Gas Laws</a>
+      <a href="#periodic-table" class="nav-link">🔬 Periodic Table</a>
+      <a href="#reference" class="nav-link">📚 Reference</a>
+      <a href="#quiz" class="nav-link">🎯 Quiz</a>
+      <a href="#about-contact" class="nav-link">📞 About</a>
+      <button class="theme-toggle" id="themeToggle" title="Toggle dark/light mode">
+        <span id="themeIcon">🌙</span>
+        <span id="themeText">Dark</span>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<header>
+<h1>Chemistry Tools - Complete Online Chemistry Calculator Suite</h1>
+<p style="margin: 10px 0 0 0; font-size: 1.1em; opacity: 0.9;">Professional-grade chemistry tools for students, educators, and professionals</p>
+
+<!-- Quick Tools Navigation -->
+<div class="quick-tools" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 20px; border-radius: 15px; margin: 20px 0; box-shadow: 0 4px 20px rgba(0,0,0,0.1);">
+  <h3 style="text-align: center; color: white; margin: 0 0 15px 0; font-size: 1.3em;">🚀 Quick Access to Tools</h3>
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+    <a href="#molar-mass" style="background: rgba(255,255,255,0.9); padding: 15px; border-radius: 10px; text-decoration: none; color: #2c3e50; text-align: center; transition: all 0.3s ease; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+      <div style="font-size: 2em; margin-bottom: 5px;">🧪</div>
+      <strong>Molar Mass Calculator</strong>
+      <div style="font-size: 0.8em; color: #666; margin-top: 5px;">Calculate molecular weights</div>
+    </a>
+    <a href="#balancer" style="background: rgba(255,255,255,0.9); padding: 15px; border-radius: 10px; text-decoration: none; color: #2c3e50; text-align: center; transition: all 0.3s ease; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+      <div style="font-size: 2em; margin-bottom: 5px;">⚖️</div>
+      <strong>Equation Balancer</strong>
+      <div style="font-size: 0.8em; color: #666; margin-top: 5px;">Balance chemical equations</div>
+    </a>
+    <a href="#stoichiometry" style="background: rgba(255,255,255,0.9); padding: 15px; border-radius: 10px; text-decoration: none; color: #2c3e50; text-align: center; transition: all 0.3s ease; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+      <div style="font-size: 2em; margin-bottom: 5px;">🧮</div>
+      <strong>Stoichiometry</strong>
+      <div style="font-size: 0.8em; color: #666; margin-top: 5px;">Mole-mass conversions</div>
+    </a>
+    <a href="#gas-laws" style="background: rgba(255,255,255,0.9); padding: 15px; border-radius: 10px; text-decoration: none; color: #2c3e50; text-align: center; transition: all 0.3s ease; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+      <div style="font-size: 2em; margin-bottom: 5px;">🌡️</div>
+      <strong>Gas Laws</strong>
+      <div style="font-size: 0.8em; color: #666; margin-top: 5px;">PV=nRT calculations</div>
+    </a>
+  </div>
+</div>
+
+<!-- Social Share Buttons -->
+<div class="social-share">
+  <a href="#" class="share-btn facebook" onclick="shareOnFacebook()">
+    📘 Facebook
+  </a>
+  <a href="#" class="share-btn twitter" onclick="shareOnTwitter()">
+    🐦 Twitter
+  </a>
+  <a href="#" class="share-btn linkedin" onclick="shareOnLinkedIn()">
+    💼 LinkedIn
+  </a>
+  <a href="#" class="share-btn whatsapp" onclick="shareOnWhatsApp()">
+    📱 WhatsApp
+  </a>
+  <a href="#" class="share-btn email" onclick="shareViaEmail()">
+    📧 Email
+  </a>
+</div>
+</header>
+
+<main>
+<!-- Breadcrumb Navigation for SEO -->
+<nav aria-label="Breadcrumb" style="background: var(--bg-secondary); padding: 10px 20px; border-radius: 8px; margin: 20px 0; box-shadow: 0 2px 8px var(--shadow-color);">
+  <ol style="list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 10px; align-items: center;">
+    <li style="display: flex; align-items: center;">
+      <a href="#" style="color: var(--accent-color); text-decoration: none; font-weight: 500;">🏠 Home</a>
+    </li>
+    <li style="color: var(--text-secondary);">›</li>
+    <li style="color: var(--text-secondary);">Chemistry Tools</li>
+    <li style="color: var(--text-secondary);">›</li>
+    <li style="color: var(--text-secondary);">Online Calculators</li>
+  </ol>
+</nav>
+
+<section id="balancer">
+<h2>⚖️ Chemical Equation Balancer</h2>
+<div style="text-align:center; margin-bottom:20px;">
+  <label for="equationInput"><strong>Enter an unbalanced equation:</strong></label>
+  <input id="equationInput" type="text" placeholder="e.g. H2 + O2 -> H2O" style="width:60%; max-width:400px; margin-left:10px;">
+  <button id="balanceBtn" style="margin-left:10px;">Balance</button>
+</div>
+<div id="balanceResult" style="min-height:32px; font-size:1.15em; color:#185a9d; font-weight:500; text-align:center; margin-bottom:10px;"></div>
+<div id="balanceSteps" style="min-height:32px; color:#2980b9; text-align:left; max-width:600px; margin:0 auto;"></div>
+</section>
+
+<section id="molar-mass">
+<h2>🧪 Molar Mass Calculator</h2>
+<div style="text-align:center; margin-bottom:20px;">
+  <label for="formulaInput"><strong>Enter Chemical Formula:</strong></label><br>
+  <input type="text" id="formulaInput" placeholder="H2O" style="width:60%; max-width:400px; margin:10px;">
+  <button id="calculateBtn">Calculate</button>
+</div>
+</section>
+
+<section id="molar-result">
+<h2>⚖️ Molar Mass Result</h2>
+<div id="result" style="background:#e8f5e8; border-left:4px solid #4caf50; padding:12px; margin:10px 0; border-radius:4px; display:block;">
+  <strong>💡 Tip:</strong> Enter a chemical formula above to calculate its molar mass. Examples: H2O, CO2, Ca(OH)2, CuSO4·5H2O
+</div>
+<div id="breakdown" style="background:#f0f8ff; border-left:4px solid #2196f3; padding:12px; margin:10px 0; border-radius:4px;"></div>
+</section>
+
+<section id="stoichiometry" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding:25px; border-radius:15px; box-shadow:0 8px 32px rgba(0,0,0,0.1); margin-top:30px;">
+  <h2 style="text-align:center; margin-bottom:20px; font-size:2em; color:white; text-shadow:2px 2px 4px rgba(0,0,0,0.3);">🧮 Stoichiometry Calculator</h2>
+  
+  <div style="background:rgba(255,255,255,0.95); padding:20px; border-radius:10px; box-shadow:0 4px 15px rgba(0,0,0,0.1);">
+    <h3 style="margin:0 0 15px 0; color:#2c3e50; font-size:1.3em; text-align:center;">📊 Choose Your Calculation Type</h3>
+    
+    <div style="display:flex; justify-content:center; gap:15px; flex-wrap:wrap; margin-bottom:20px;">
+      <button id="moleMassBtn" class="calcTypeBtn" style="padding:12px 20px; background:linear-gradient(45deg, #3498db, #2980b9); color:white; border:none; border-radius:8px; font-size:1em; font-weight:bold; cursor:pointer; box-shadow:0 4px 15px rgba(52,152,219,0.3); transition:all 0.3s ease;">⚖️ Mole-Mass Conversion</button>
+      <button id="limitingReactantBtn" class="calcTypeBtn" style="padding:12px 20px; background:linear-gradient(45deg, #e74c3c, #c0392b); color:white; border:none; border-radius:8px; font-size:1em; font-weight:bold; cursor:pointer; box-shadow:0 4px 15px rgba(231,76,60,0.3); transition:all 0.3s ease;">🔬 Limiting Reactant</button>
+      <button id="percentYieldBtn" class="calcTypeBtn" style="padding:12px 20px; background:linear-gradient(45deg, #27ae60, #2ecc71); color:white; border:none; border-radius:8px; font-size:1em; font-weight:bold; cursor:pointer; box-shadow:0 4px 15px rgba(39,174,96,0.3); transition:all 0.3s ease;">📈 Percent Yield</button>
+    </div>
+    
+    <!-- Mole-Mass Conversion Section -->
+    <div id="moleMassSection" style="display:none;">
+      <h4 style="color:#2c3e50; margin-bottom:15px;">⚖️ Mole-Mass Conversion</h4>
+      <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap:15px; margin-bottom:15px;">
+        <div>
+          <label for="moleMassFormula"><strong>Chemical Formula:</strong></label>
+          <input id="moleMassFormula" type="text" placeholder="e.g. H2O" style="width:100%; padding:8px; border:2px solid #3498db; border-radius:5px;">
+        </div>
+        <div>
+          <label for="moleMassAmount"><strong>Amount:</strong></label>
+          <input id="moleMassAmount" type="number" step="0.001" placeholder="Enter amount" style="width:100%; padding:8px; border:2px solid #3498db; border-radius:5px;">
+        </div>
+        <div>
+          <label for="moleMassUnit"><strong>Unit:</strong></label>
+          <select id="moleMassUnit" style="width:100%; padding:8px; border:2px solid #3498db; border-radius:5px;">
+            <option value="moles">Moles</option>
+            <option value="grams">Grams</option>
+            <option value="particles">Particles (molecules/atoms)</option>
+          </select>
+        </div>
+      </div>
+      <button id="calculateMoleMassBtn" style="padding:10px 20px; background:linear-gradient(45deg, #3498db, #2980b9); color:white; border:none; border-radius:5px; cursor:pointer; font-weight:bold;">Calculate</button>
+      <div id="moleMassResult" style="margin-top:15px; padding:15px; background:#f8f9fa; border-radius:8px; border-left:4px solid #3498db;"></div>
+    </div>
+    
+    <!-- Limiting Reactant Section -->
+    <div id="limitingReactantSection" style="display:none;">
+      <h4 style="color:#2c3e50; margin-bottom:15px;">🔬 Limiting Reactant Problem</h4>
+      <div style="margin-bottom:15px;">
+        <label for="limitingEquation"><strong>Balanced Equation:</strong></label>
+        <input id="limitingEquation" type="text" placeholder="e.g. 2H2 + O2 -> 2H2O" style="width:100%; padding:8px; border:2px solid #e74c3c; border-radius:5px; margin-top:5px;">
+      </div>
+      <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:15px; margin-bottom:15px;">
+        <div>
+          <label for="reactant1"><strong>Reactant 1:</strong></label>
+          <input id="reactant1" type="text" placeholder="e.g. H2" style="width:100%; padding:8px; border:2px solid #e74c3c; border-radius:5px;">
+        </div>
+        <div>
+          <label for="amount1"><strong>Amount (g):</strong></label>
+          <input id="amount1" type="number" step="0.001" placeholder="Enter grams" style="width:100%; padding:8px; border:2px solid #e74c3c; border-radius:5px;">
+        </div>
+        <div>
+          <label for="reactant2"><strong>Reactant 2:</strong></label>
+          <input id="reactant2" type="text" placeholder="e.g. O2" style="width:100%; padding:8px; border:2px solid #e74c3c; border-radius:5px;">
+        </div>
+        <div>
+          <label for="amount2"><strong>Amount (g):</strong></label>
+          <input id="amount2" type="number" step="0.001" placeholder="Enter grams" style="width:100%; padding:8px; border:2px solid #e74c3c; border-radius:5px;">
+        </div>
+      </div>
+      <button id="calculateLimitingBtn" style="padding:10px 20px; background:linear-gradient(45deg, #e74c3c, #c0392b); color:white; border:none; border-radius:5px; cursor:pointer; font-weight:bold;">Find Limiting Reactant</button>
+      <div id="limitingResult" style="margin-top:15px; padding:15px; background:#f8f9fa; border-radius:8px; border-left:4px solid #e74c3c;"></div>
+    </div>
+    
+    <!-- Percent Yield Section -->
+    <div id="percentYieldSection" style="display:none;">
+      <h4 style="color:#2c3e50; margin-bottom:15px;">📈 Percent Yield Calculation</h4>
+      <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:15px; margin-bottom:15px;">
+        <div>
+          <label for="theoreticalYield"><strong>Theoretical Yield (g):</strong></label>
+          <input id="theoreticalYield" type="number" step="0.001" placeholder="Expected amount" style="width:100%; padding:8px; border:2px solid #27ae60; border-radius:5px;">
+        </div>
+        <div>
+          <label for="actualYield"><strong>Actual Yield (g):</strong></label>
+          <input id="actualYield" type="number" step="0.001" placeholder="Measured amount" style="width:100%; padding:8px; border:2px solid #27ae60; border-radius:5px;">
+        </div>
+      </div>
+      <button id="calculateYieldBtn" style="padding:10px 20px; background:linear-gradient(45deg, #27ae60, #2ecc71); color:white; border:none; border-radius:5px; cursor:pointer; font-weight:bold;">Calculate Percent Yield</button>
+      <div id="yieldResult" style="margin-top:15px; padding:15px; background:#f8f9fa; border-radius:8px; border-left:4px solid #27ae60;"></div>
+    </div>
+  </div>
+</section>
+
+<section id="gas-laws" style="background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%); padding:25px; border-radius:15px; box-shadow:0 8px 32px rgba(0,0,0,0.1); margin-top:30px;">
+  <h2 style="text-align:center; margin-bottom:20px; font-size:2em; color:white; text-shadow:2px 2px 4px rgba(0,0,0,0.3);">🌡️ Gas Laws Calculator</h2>
+  
+  <div style="background:rgba(255,255,255,0.95); padding:20px; border-radius:10px; box-shadow:0 4px 15px rgba(0,0,0,0.1);">
+    <h3 style="margin:0 0 15px 0; color:#2c3e50; font-size:1.3em; text-align:center;">🌬️ Choose Your Gas Law</h3>
+    
+    <div style="display:flex; justify-content:center; gap:15px; flex-wrap:wrap; margin-bottom:20px;">
+      <button id="idealGasBtn" class="gasLawBtn" style="padding:12px 20px; background:linear-gradient(45deg, #ff6b6b, #ee5a24); color:white; border:none; border-radius:8px; font-size:1em; font-weight:bold; cursor:pointer; box-shadow:0 4px 15px rgba(255,107,107,0.3); transition:all 0.3s ease;">⚗️ Ideal Gas Law (PV=nRT)</button>
+      <button id="boylesLawBtn" class="gasLawBtn" style="padding:12px 20px; background:linear-gradient(45deg, #4834d4, #686de0); color:white; border:none; border-radius:8px; font-size:1em; font-weight:bold; cursor:pointer; box-shadow:0 4px 15px rgba(72,52,212,0.3); transition:all 0.3s ease;">📊 Boyle's Law</button>
+      <button id="charlesLawBtn" class="gasLawBtn" style="padding:12px 20px; background:linear-gradient(45deg, #00b894, #00cec9); color:white; border:none; border-radius:8px; font-size:1em; font-weight:bold; cursor:pointer; box-shadow:0 4px 15px rgba(0,184,148,0.3); transition:all 0.3s ease;">🌡️ Charles's Law</button>
+      <button id="combinedGasBtn" class="gasLawBtn" style="padding:12px 20px; background:linear-gradient(45deg, #fdcb6e, #e17055); color:white; border:none; border-radius:8px; font-size:1em; font-weight:bold; cursor:pointer; box-shadow:0 4px 15px rgba(253,203,110,0.3); transition:all 0.3s ease;">🔄 Combined Gas Law</button>
+    </div>
+    
+    <!-- Ideal Gas Law Section -->
+    <div id="idealGasSection" style="display:none;">
+      <h4 style="color:#2c3e50; margin-bottom:15px;">⚗️ Ideal Gas Law (PV = nRT)</h4>
+      <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:15px; margin-bottom:15px;">
+        <div>
+          <label for="idealPressure"><strong>Pressure (P):</strong></label>
+          <input id="idealPressure" type="number" step="0.001" placeholder="Enter pressure" style="width:100%; padding:8px; border:2px solid #ff6b6b; border-radius:5px;">
+          <select id="pressureUnit" style="width:100%; padding:4px; margin-top:5px; border:2px solid #ff6b6b; border-radius:3px;">
+            <option value="atm">atm</option>
+            <option value="kPa">kPa</option>
+            <option value="mmHg">mmHg</option>
+            <option value="bar">bar</option>
+          </select>
+        </div>
+        <div>
+          <label for="idealVolume"><strong>Volume (V):</strong></label>
+          <input id="idealVolume" type="number" step="0.001" placeholder="Enter volume" style="width:100%; padding:8px; border:2px solid #ff6b6b; border-radius:5px;">
+          <select id="volumeUnit" style="width:100%; padding:4px; margin-top:5px; border:2px solid #ff6b6b; border-radius:3px;">
+            <option value="L">L</option>
+            <option value="mL">mL</option>
+            <option value="m3">m³</option>
+          </select>
+        </div>
+        <div>
+          <label for="idealMoles"><strong>Moles (n):</strong></label>
+          <input id="idealMoles" type="number" step="0.001" placeholder="Enter moles" style="width:100%; padding:8px; border:2px solid #ff6b6b; border-radius:5px;">
+        </div>
+        <div>
+          <label for="idealTemp"><strong>Temperature (T):</strong></label>
+          <input id="idealTemp" type="number" step="0.1" placeholder="Enter temperature" style="width:100%; padding:8px; border:2px solid #ff6b6b; border-radius:5px;">
+          <select id="tempUnit" style="width:100%; padding:4px; margin-top:5px; border:2px solid #ff6b6b; border-radius:3px;">
+            <option value="K">Kelvin (K)</option>
+            <option value="C">Celsius (°C)</option>
+            <option value="F">Fahrenheit (°F)</option>
+          </select>
+        </div>
+      </div>
+      <div style="margin-bottom:15px;">
+        <label for="idealSolveFor"><strong>Solve for:</strong></label>
+        <select id="idealSolveFor" style="width:100%; padding:8px; border:2px solid #ff6b6b; border-radius:5px;">
+          <option value="P">Pressure (P)</option>
+          <option value="V">Volume (V)</option>
+          <option value="n">Moles (n)</option>
+          <option value="T">Temperature (T)</option>
+        </select>
+      </div>
+      <button id="calculateIdealBtn" style="padding:10px 20px; background:linear-gradient(45deg, #ff6b6b, #ee5a24); color:white; border:none; border-radius:5px; cursor:pointer; font-weight:bold;">Calculate</button>
+      <div id="idealResult" style="margin-top:15px; padding:15px; background:#f8f9fa; border-radius:8px; border-left:4px solid #ff6b6b;"></div>
+    </div>
+    
+    <!-- Boyle's Law Section -->
+    <div id="boylesLawSection" style="display:none;">
+      <h4 style="color:#2c3e50; margin-bottom:15px;">📊 Boyle's Law (P₁V₁ = P₂V₂)</h4>
+      <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:15px; margin-bottom:15px;">
+        <div>
+          <label for="boyleP1"><strong>Initial Pressure (P₁):</strong></label>
+          <input id="boyleP1" type="number" step="0.001" placeholder="Enter pressure" style="width:100%; padding:8px; border:2px solid #4834d4; border-radius:5px;">
+          <select id="boylePUnit" style="width:100%; padding:4px; margin-top:5px; border:2px solid #4834d4; border-radius:3px;">
+            <option value="atm">atm</option>
+            <option value="kPa">kPa</option>
+            <option value="mmHg">mmHg</option>
+          </select>
+        </div>
+        <div>
+          <label for="boyleV1"><strong>Initial Volume (V₁):</strong></label>
+          <input id="boyleV1" type="number" step="0.001" placeholder="Enter volume" style="width:100%; padding:8px; border:2px solid #4834d4; border-radius:5px;">
+          <select id="boyleVUnit" style="width:100%; padding:4px; margin-top:5px; border:2px solid #4834d4; border-radius:3px;">
+            <option value="L">L</option>
+            <option value="mL">mL</option>
+          </select>
+        </div>
+        <div>
+          <label for="boyleP2"><strong>Final Pressure (P₂):</strong></label>
+          <input id="boyleP2" type="number" step="0.001" placeholder="Enter pressure" style="width:100%; padding:8px; border:2px solid #4834d4; border-radius:5px;">
+        </div>
+        <div>
+          <label for="boyleV2"><strong>Final Volume (V₂):</strong></label>
+          <input id="boyleV2" type="number" step="0.001" placeholder="Enter volume" style="width:100%; padding:8px; border:2px solid #4834d4; border-radius:5px;">
+        </div>
+      </div>
+      <div style="margin-bottom:15px;">
+        <label for="boyleSolveFor"><strong>Solve for:</strong></label>
+        <select id="boyleSolveFor" style="width:100%; padding:8px; border:2px solid #4834d4; border-radius:5px;">
+          <option value="P2">Final Pressure (P₂)</option>
+          <option value="V2">Final Volume (V₂)</option>
+        </select>
+      </div>
+      <button id="calculateBoyleBtn" style="padding:10px 20px; background:linear-gradient(45deg, #4834d4, #686de0); color:white; border:none; border-radius:5px; cursor:pointer; font-weight:bold;">Calculate</button>
+      <div id="boyleResult" style="margin-top:15px; padding:15px; background:#f8f9fa; border-radius:8px; border-left:4px solid #4834d4;"></div>
+    </div>
+    
+    <!-- Charles's Law Section -->
+    <div id="charlesLawSection" style="display:none;">
+      <h4 style="color:#2c3e50; margin-bottom:15px;">🌡️ Charles's Law (V₁/T₁ = V₂/T₂)</h4>
+      <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:15px; margin-bottom:15px;">
+        <div>
+          <label for="charlesV1"><strong>Initial Volume (V₁):</strong></label>
+          <input id="charlesV1" type="number" step="0.001" placeholder="Enter volume" style="width:100%; padding:8px; border:2px solid #00b894; border-radius:5px;">
+          <select id="charlesVUnit" style="width:100%; padding:4px; margin-top:5px; border:2px solid #00b894; border-radius:3px;">
+            <option value="L">L</option>
+            <option value="mL">mL</option>
+          </select>
+        </div>
+        <div>
+          <label for="charlesT1"><strong>Initial Temperature (T₁):</strong></label>
+          <input id="charlesT1" type="number" step="0.1" placeholder="Enter temperature" style="width:100%; padding:8px; border:2px solid #00b894; border-radius:5px;">
+          <select id="charlesTUnit" style="width:100%; padding:4px; margin-top:5px; border:2px solid #00b894; border-radius:3px;">
+            <option value="K">Kelvin (K)</option>
+            <option value="C">Celsius (°C)</option>
+          </select>
+        </div>
+        <div>
+          <label for="charlesV2"><strong>Final Volume (V₂):</strong></label>
+          <input id="charlesV2" type="number" step="0.001" placeholder="Enter volume" style="width:100%; padding:8px; border:2px solid #00b894; border-radius:5px;">
+        </div>
+        <div>
+          <label for="charlesT2"><strong>Final Temperature (T₂):</strong></label>
+          <input id="charlesT2" type="number" step="0.1" placeholder="Enter temperature" style="width:100%; padding:8px; border:2px solid #00b894; border-radius:5px;">
+        </div>
+      </div>
+      <div style="margin-bottom:15px;">
+        <label for="charlesSolveFor"><strong>Solve for:</strong></label>
+        <select id="charlesSolveFor" style="width:100%; padding:8px; border:2px solid #00b894; border-radius:5px;">
+          <option value="V2">Final Volume (V₂)</option>
+          <option value="T2">Final Temperature (T₂)</option>
+        </select>
+      </div>
+      <button id="calculateCharlesBtn" style="padding:10px 20px; background:linear-gradient(45deg, #00b894, #00cec9); color:white; border:none; border-radius:5px; cursor:pointer; font-weight:bold;">Calculate</button>
+      <div id="charlesResult" style="margin-top:15px; padding:15px; background:#f8f9fa; border-radius:8px; border-left:4px solid #00b894;"></div>
+    </div>
+    
+    <!-- Combined Gas Law Section -->
+    <div id="combinedGasSection" style="display:none;">
+      <h4 style="color:#2c3e50; margin-bottom:15px;">🔄 Combined Gas Law (P₁V₁/T₁ = P₂V₂/T₂)</h4>
+      <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:15px; margin-bottom:15px;">
+        <div>
+          <label for="combinedP1"><strong>Initial Pressure (P₁):</strong></label>
+          <input id="combinedP1" type="number" step="0.001" placeholder="Enter pressure" style="width:100%; padding:8px; border:2px solid #fdcb6e; border-radius:5px;">
+          <select id="combinedPUnit" style="width:100%; padding:4px; margin-top:5px; border:2px solid #fdcb6e; border-radius:3px;">
+            <option value="atm">atm</option>
+            <option value="kPa">kPa</option>
+            <option value="mmHg">mmHg</option>
+          </select>
+        </div>
+        <div>
+          <label for="combinedV1"><strong>Initial Volume (V₁):</strong></label>
+          <input id="combinedV1" type="number" step="0.001" placeholder="Enter volume" style="width:100%; padding:8px; border:2px solid #fdcb6e; border-radius:5px;">
+          <select id="combinedVUnit" style="width:100%; padding:4px; margin-top:5px; border:2px solid #fdcb6e; border-radius:3px;">
+            <option value="L">L</option>
+            <option value="mL">mL</option>
+          </select>
+        </div>
+        <div>
+          <label for="combinedT1"><strong>Initial Temperature (T₁):</strong></label>
+          <input id="combinedT1" type="number" step="0.1" placeholder="Enter temperature" style="width:100%; padding:8px; border:2px solid #fdcb6e; border-radius:5px;">
+          <select id="combinedTUnit" style="width:100%; padding:4px; margin-top:5px; border:2px solid #fdcb6e; border-radius:3px;">
+            <option value="K">Kelvin (K)</option>
+            <option value="C">Celsius (°C)</option>
+          </select>
+        </div>
+        <div>
+          <label for="combinedP2"><strong>Final Pressure (P₂):</strong></label>
+          <input id="combinedP2" type="number" step="0.001" placeholder="Enter pressure" style="width:100%; padding:8px; border:2px solid #fdcb6e; border-radius:5px;">
+        </div>
+        <div>
+          <label for="combinedV2"><strong>Final Volume (V₂):</strong></label>
+          <input id="combinedV2" type="number" step="0.001" placeholder="Enter volume" style="width:100%; padding:8px; border:2px solid #fdcb6e; border-radius:5px;">
+        </div>
+        <div>
+          <label for="combinedT2"><strong>Final Temperature (T₂):</strong></label>
+          <input id="combinedT2" type="number" step="0.1" placeholder="Enter temperature" style="width:100%; padding:8px; border:2px solid #fdcb6e; border-radius:5px;">
+        </div>
+      </div>
+      <div style="margin-bottom:15px;">
+        <label for="combinedSolveFor"><strong>Solve for:</strong></label>
+        <select id="combinedSolveFor" style="width:100%; padding:8px; border:2px solid #fdcb6e; border-radius:5px;">
+          <option value="P2">Final Pressure (P₂)</option>
+          <option value="V2">Final Volume (V₂)</option>
+          <option value="T2">Final Temperature (T₂)</option>
+        </select>
+      </div>
+      <button id="calculateCombinedBtn" style="padding:10px 20px; background:linear-gradient(45deg, #fdcb6e, #e17055); color:white; border:none; border-radius:5px; cursor:pointer; font-weight:bold;">Calculate</button>
+      <div id="combinedResult" style="margin-top:15px; padding:15px; background:#f8f9fa; border-radius:8px; border-left:4px solid #fdcb6e;"></div>
+    </div>
+  </div>
+</section>
+
+<section id="element-info">
+<h2>🔬 Element Information</h2>
+<div id="elementInfo" style="background:#fff3e0; border-left:4px solid #ff9800; padding:12px; margin:10px 0; border-radius:4px; display:block;">
+  <strong>📋 Instructions:</strong> Click on any element in the periodic table below to view its detailed information including atomic mass, group classification, description, and common uses.
+</div>
+</section>
+
+<section id="periodic-table">
+<h2>🔬 Interactive Periodic Table</h2>
+<div id="periodicTableWrapper">
+<div id="periodicTable"></div>
+</div>
+</section>
+
+<!-- Chemistry Reference Guide Section -->
+<section id="reference" style="background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%); padding:25px; border-radius:15px; box-shadow:0 8px 32px rgba(0,0,0,0.1); margin-top:30px;">
+  <h2 style="text-align:center; margin-bottom:20px; font-size:2em; color:white; text-shadow:2px 2px 4px rgba(0,0,0,0.3);">📚 Chemistry Reference Guide</h2>
+  
+  <div style="background:rgba(255,255,255,0.95); padding:20px; border-radius:10px; box-shadow:0 4px 15px rgba(0,0,0,0.1);">
+    <h3 style="margin:0 0 15px 0; color:#2c3e50; font-size:1.3em; text-align:center;">🔍 Quick Reference Tables</h3>
+    <p style="text-align:center; color:#666; margin-bottom:20px;">
+      Essential chemistry knowledge for students and professionals. Use these references with our 
+      <a href="#molar-mass" style="color:#3498db; text-decoration:none;">🧪 Molar Mass Calculator</a>, 
+      <a href="#balancer" style="color:#3498db; text-decoration:none;">⚖️ Equation Balancer</a>, and 
+      <a href="#stoichiometry" style="color:#3498db; text-decoration:none;">🧮 Stoichiometry Calculator</a>.
+    </p>
+    
+    <!-- Reference Guide Tabs -->
+    <div style="display:flex; justify-content:center; gap:10px; flex-wrap:wrap; margin-bottom:20px;">
+      <button class="referenceTab active" data-target="polyatomicIons" style="padding:10px 15px; background:linear-gradient(45deg, #3498db, #2980b9); color:white; border:none; border-radius:5px; font-size:0.9em; font-weight:bold; cursor:pointer; transition:all 0.3s ease;">⚡ Polyatomic Ions</button>
+      <button class="referenceTab" data-target="solubilityRules" style="padding:10px 15px; background:linear-gradient(45deg, #e74c3c, #c0392b); color:white; border:none; border-radius:5px; font-size:0.9em; font-weight:bold; cursor:pointer; transition:all 0.3s ease;">💧 Solubility Rules</button>
+      <button class="referenceTab" data-target="oxidationStates" style="padding:10px 15px; background:linear-gradient(45deg, #27ae60, #2ecc71); color:white; border:none; border-radius:5px; font-size:0.9em; font-weight:bold; cursor:pointer; transition:all 0.3s ease;">⚛️ Oxidation States</button>
+      <button class="referenceTab" data-target="acidBaseIndicators" style="padding:10px 15px; background:linear-gradient(45deg, #f39c12, #e67e22); color:white; border:none; border-radius:5px; font-size:0.9em; font-weight:bold; cursor:pointer; transition:all 0.3s ease;">🎨 pH Indicators</button>
+      <button class="referenceTab" data-target="labEquipment" style="padding:10px 15px; background:linear-gradient(45deg, #9b59b6, #8e44ad); color:white; border:none; border-radius:5px; font-size:0.9em; font-weight:bold; cursor:pointer; transition:all 0.3s ease;">🧪 Lab Equipment</button>
+    </div>
+    
+    <!-- Reference Content Sections -->
+    <div id="polyatomicIons" class="referenceContent" style="display:block;">
+      <h4 style="color:#2c3e50; margin-bottom:15px; text-align:center;">⚡ Common Polyatomic Ions</h4>
+      <div id="polyatomicIonsList" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap:10px;"></div>
+    </div>
+    
+    <div id="solubilityRules" class="referenceContent" style="display:none;">
+      <h4 style="color:#2c3e50; margin-bottom:15px; text-align:center;">💧 Solubility Rules</h4>
+      <div id="solubilityRulesList" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap:10px;"></div>
+    </div>
+    
+    <div id="oxidationStates" class="referenceContent" style="display:none;">
+      <h4 style="color:#2c3e50; margin-bottom:15px; text-align:center;">⚛️ Common Oxidation States</h4>
+      <div id="oxidationStatesList" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap:10px;"></div>
+    </div>
+    
+    <div id="acidBaseIndicators" class="referenceContent" style="display:none;">
+      <h4 style="color:#2c3e50; margin-bottom:15px; text-align:center;">🎨 Acid-Base Indicators</h4>
+      <div id="acidBaseIndicatorsList" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap:10px;"></div>
+    </div>
+    
+    <div id="labEquipment" class="referenceContent" style="display:none;">
+      <h4 style="color:#2c3e50; margin-bottom:15px; text-align:center;">🧪 Common Laboratory Equipment</h4>
+      <div id="labEquipmentList" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap:10px;"></div>
+    </div>
+  </div>
+</section>
+
+<section id="quiz" style="margin-top:40px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding:30px; border-radius:15px; box-shadow:0 8px 32px rgba(0,0,0,0.1);">
+  <h2 style="text-align:center; margin-bottom:25px; font-size:2.2em; color:white; text-shadow:2px 2px 4px rgba(0,0,0,0.3);">🧪 Chemistry Quiz Challenge</h2>
+  
+  <div style="text-align:center; margin-bottom:25px; background:rgba(255,255,255,0.9); padding:20px; border-radius:10px; box-shadow:0 4px 15px rgba(0,0,0,0.1);">
+    <h3 style="margin:0 0 15px 0; color:#2c3e50; font-size:1.3em;">🎯 Select Your Challenge Level</h3>
+    <div style="display:flex; justify-content:center; align-items:center; gap:15px; flex-wrap:wrap;">
+      <label for="quizCountSelect" style="font-weight:bold; color:#2c3e50; font-size:1.1em;">Number of Questions:</label>
+      <select id="quizCountSelect" style="padding:10px 15px; border:2px solid #3498db; border-radius:8px; font-size:1em; background:white; cursor:pointer;">
+        <option value="5">5 Questions</option>
+        <option value="10">10 Questions</option>
+        <option value="15">15 Questions</option>
+        <option value="20">20 Questions</option>
+        <option value="all">All Questions</option>
+      </select>
+      <button id="startQuizBtn" style="padding:12px 25px; background:linear-gradient(45deg, #3498db, #2980b9); color:white; border:none; border-radius:8px; font-size:1.1em; font-weight:bold; cursor:pointer; box-shadow:0 4px 15px rgba(52,152,219,0.3); transition:all 0.3s ease;">🚀 Start Quiz</button>
+    </div>
+  </div>
+  
+  <div id="quizContainer" style="max-width:700px; margin:auto; background:rgba(255,255,255,0.95); padding:30px; border-radius:15px; box-shadow:0 8px 25px rgba(0,0,0,0.15); display:none;">
+    <div id="quizQuestion" style="font-weight:bold; font-size:1.4em; margin-bottom:25px; color:#2c3e50; text-align:center; line-height:1.4; background:linear-gradient(45deg, #f8f9fa, #e9ecef); padding:20px; border-radius:10px; border-left:5px solid #3498db;"></div>
+    
+    <div id="quizOptions" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap:15px; margin-bottom:25px;"></div>
+    
+    <div id="quizFeedback" style="margin:20px 0; font-weight:bold; font-size:1.1em; text-align:center; padding:15px; border-radius:8px;"></div>
+    
+    <button id="nextQuestionBtn" style="display:none; margin:20px auto; padding:15px 30px; background:linear-gradient(45deg, #27ae60, #2ecc71); color:white; border:none; border-radius:10px; cursor:pointer; font-size:1.1em; font-weight:bold; box-shadow:0 4px 15px rgba(39,174,96,0.3); transition:all 0.3s ease;">⏭️ Next Question</button>
+    
+    <div id="quizScore" style="margin-top:25px; font-weight:bold; text-align:center; font-size:1.2em; color:#2c3e50; background:linear-gradient(45deg, #f8f9fa, #e9ecef); padding:15px; border-radius:8px;"></div>
+  </div>
+</section>
+
+<!-- About & Contact Section -->
+<section id="about-contact" style="background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-primary) 100%); padding:40px; border-radius:15px; box-shadow:0 8px 32px var(--shadow-color); margin-top:40px;">
+  <h2 style="text-align:center; margin-bottom:30px; font-size:2em; color:var(--text-primary);">📞 About & Contact</h2>
+  
+  <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap:30px;">
+    <!-- About Section -->
+    <div style="background:var(--bg-secondary); padding:25px; border-radius:10px; box-shadow:0 4px 15px var(--shadow-color);">
+      <h3 style="color:var(--text-primary); margin-bottom:20px; font-size:1.4em;">🧪 About Chemistry Tools</h3>
+      <p style="color:var(--text-secondary); line-height:1.6; margin-bottom:15px;">
+        Chemistry Tools is a comprehensive online platform providing free, professional-grade chemistry calculators and educational resources. 
+        Our mission is to make chemistry accessible to students, educators, and professionals worldwide.
+      </p>
+      <p style="color:var(--text-secondary); line-height:1.6;">
+        All tools are designed with accuracy and ease of use in mind, featuring real-time calculations, 
+        detailed explanations, and an interactive periodic table with 118 elements.
+      </p>
+    </div>
+    
+    <!-- Contact Section -->
+    <div style="background:var(--bg-secondary); padding:25px; border-radius:10px; box-shadow:0 4px 15px var(--shadow-color);">
+      <h3 style="color:var(--text-primary); margin-bottom:20px; font-size:1.4em;">📧 Contact & Support</h3>
+      <div style="margin-bottom:15px;">
+        <strong style="color:var(--text-primary);">Email:</strong> 
+        <a href="mailto:support@chemistrytools.com" style="color:var(--accent-color); text-decoration:none;">support@chemistrytools.com</a>
+      </div>
+      <div style="margin-bottom:15px;">
+        <strong style="color:var(--text-primary);">GitHub:</strong> 
+        <a href="https://github.com/chemistrytools" target="_blank" style="color:var(--accent-color); text-decoration:none;">github.com/chemistrytools</a>
+      </div>
+      <div style="margin-bottom:15px;">
+        <strong style="color:var(--text-primary);">Documentation:</strong> 
+        <a href="#reference" style="color:var(--accent-color); text-decoration:none;">Chemistry Reference Guide</a>
+      </div>
+      <p style="color:var(--text-secondary); font-size:0.9em; margin-top:20px;">
+        💡 <strong>Tip:</strong> Use the navigation bar above to quickly jump between different tools and features.
+      </p>
+    </div>
+  </div>
+  
+  <!-- Trust Indicators -->
+  <div style="text-align:center; margin-top:30px; padding:20px; background:var(--bg-tertiary); border-radius:10px;">
+    <h4 style="color:var(--text-primary); margin-bottom:15px;">🔒 Trust & Security</h4>
+    <div style="display:flex; justify-content:center; gap:20px; flex-wrap:wrap;">
+      <div style="color:var(--text-secondary);">
+        <div style="font-size:1.5em; margin-bottom:5px;">✅</div>
+        <div>No Registration Required</div>
+      </div>
+      <div style="color:var(--text-secondary);">
+        <div style="font-size:1.5em; margin-bottom:5px;">🔒</div>
+        <div>100% Free to Use</div>
+      </div>
+      <div style="color:var(--text-secondary);">
+        <div style="font-size:1.5em; margin-bottom:5px;">📱</div>
+        <div>Mobile Optimized</div>
+      </div>
+      <div style="color:var(--text-secondary);">
+        <div style="font-size:1.5em; margin-bottom:5px;">🌐</div>
+        <div>Works Offline</div>
+      </div>
+    </div>
+    
+    <!-- Social Share Section -->
+    <div style="text-align:center; margin-top:30px; padding:20px; background:var(--bg-quaternary); border-radius:10px;">
+      <h4 style="color:var(--text-primary); margin-bottom:15px;">📤 Share Chemistry Tools</h4>
+      <p style="color:var(--text-secondary); margin-bottom:20px;">Help other students and professionals discover these free chemistry tools!</p>
+      <div class="social-share">
+        <a href="#" class="share-btn facebook" onclick="shareOnFacebook()">
+          📘 Facebook
+        </a>
+        <a href="#" class="share-btn twitter" onclick="shareOnTwitter()">
+          🐦 Twitter
+        </a>
+        <a href="#" class="share-btn linkedin" onclick="shareOnLinkedIn()">
+          💼 LinkedIn
+        </a>
+        <a href="#" class="share-btn whatsapp" onclick="shareOnWhatsApp()">
+          📱 WhatsApp
+        </a>
+        <a href="#" class="share-btn email" onclick="shareViaEmail()">
+          📧 Email
+        </a>
+      </div>
+    </div>
+    
+    <!-- FAQ Section -->
+    <div style="margin-top:30px; padding:20px; background:var(--bg-quinary); border-radius:10px;">
+      <h4 style="color:var(--text-primary); margin-bottom:20px; text-align:center;">❓ Frequently Asked Questions</h4>
+      <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap:20px;">
+        <div style="background:var(--bg-secondary); padding:15px; border-radius:8px; box-shadow:0 2px 10px var(--shadow-color);">
+          <h5 style="color:var(--text-primary); margin-bottom:10px;">🧪 What is molar mass?</h5>
+          <p style="color:var(--text-secondary); font-size:0.9em; line-height:1.5;">
+            Molar mass is the mass of one mole of a substance, measured in grams per mole (g/mol). Use our 
+            <a href="#molar-mass" style="color:var(--accent-color); text-decoration:none;">Molar Mass Calculator</a> 
+            to find it for any chemical formula.
+          </p>
+        </div>
+        <div style="background:var(--bg-secondary); padding:15px; border-radius:8px; box-shadow:0 2px 10px var(--shadow-color);">
+          <h5 style="color:var(--text-primary); margin-bottom:10px;">⚖️ How do you balance equations?</h5>
+          <p style="color:var(--text-secondary); font-size:0.9em; line-height:1.5;">
+            Chemical equations must have the same number of each atom on both sides. Our 
+            <a href="#balancer" style="color:var(--accent-color); text-decoration:none;">Equation Balancer</a> 
+            does this automatically with step-by-step solutions.
+          </p>
+        </div>
+        <div style="background:var(--bg-secondary); padding:15px; border-radius:8px; box-shadow:0 2px 10px var(--shadow-color);">
+          <h5 style="color:var(--text-primary); margin-bottom:10px;">🧮 What is stoichiometry?</h5>
+          <p style="color:var(--text-secondary); font-size:0.9em; line-height:1.5;">
+            Stoichiometry calculates the relationships between reactants and products in chemical reactions. Use our 
+            <a href="#stoichiometry" style="color:var(--accent-color); text-decoration:none;">Stoichiometry Calculator</a> 
+            for mole-mass conversions and limiting reactant analysis.
+          </p>
+        </div>
+        <div style="background:var(--bg-secondary); padding:15px; border-radius:8px; box-shadow:0 2px 10px var(--shadow-color);">
+          <h5 style="color:var(--text-primary); margin-bottom:10px;">🌡️ What are gas laws?</h5>
+          <p style="color:var(--text-secondary); font-size:0.9em; line-height:1.5;">
+            Gas laws describe how pressure, volume, and temperature relate in gases. Our 
+            <a href="#gas-laws" style="color:var(--accent-color); text-decoration:none;">Gas Laws Calculator</a> 
+            includes Boyle's, Charles's, and the Ideal Gas Law.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+<h2 style="font-size:1.2em; margin-bottom:10px;">Chemistry Tools</h2>
+<p style="margin:5px 0;">Free online chemistry calculators and educational resources</p>
+<p style="margin:5px 0;">&copy; 2025 Chemistry Tools. All rights reserved.</p>
+</footer>
+
+<script>
+// Social Sharing Functions
+function shareOnFacebook() {
+  const url = encodeURIComponent(window.location.href);
+  const text = encodeURIComponent('🧪 Check out these amazing Chemistry Tools - Free calculators for molar mass, equation balancing, stoichiometry, and more!');
+  window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}&quote=${text}`, '_blank');
+}
+
+function shareOnTwitter() {
+  const url = encodeURIComponent(window.location.href);
+  const text = encodeURIComponent('🧪 Amazing Chemistry Tools! Free calculators for students and professionals. Check it out!');
+  window.open(`https://twitter.com/intent/tweet?url=${url}&text=${text}&hashtags=chemistry,education,calculators`, '_blank');
+}
+
+function shareOnLinkedIn() {
+  const url = encodeURIComponent(window.location.href);
+  const title = encodeURIComponent('Chemistry Tools - Free Online Calculators');
+  const summary = encodeURIComponent('Professional-grade chemistry tools for students, educators, and professionals. Includes molar mass calculator, equation balancer, stoichiometry, gas laws, and interactive periodic table.');
+  window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${url}&title=${title}&summary=${summary}`, '_blank');
+}
+
+function shareOnWhatsApp() {
+  const url = encodeURIComponent(window.location.href);
+  const text = encodeURIComponent('🧪 Check out these Chemistry Tools - Free calculators for chemistry students!');
+  window.open(`https://wa.me/?text=${text}%20${url}`, '_blank');
+}
+
+function shareViaEmail() {
+  const subject = encodeURIComponent('Chemistry Tools - Free Online Calculators');
+  const body = encodeURIComponent(`Hi there!
+
+I found this amazing Chemistry Tools website with free calculators for:
+• Molar Mass Calculator
+• Chemical Equation Balancer  
+• Stoichiometry Calculator
+• Gas Laws Calculator
+• Interactive Periodic Table
+• Chemistry Reference Guide
+• Chemistry Quiz
+
+Check it out: ${window.location.href}
+
+Perfect for chemistry students and professionals!`);
+  window.open(`mailto:?subject=${subject}&body=${body}`, '_blank');
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+  const quizQuestions = [
+    { q: "Which element is used in fireworks to produce red color?", options: ["Sr", "Na", "K", "Cu"], answer: "Sr", hint: "Think of alkali earth metals." },
+    { q: "What is the molar mass of H2O?", options: ["18.015", "20.000", "16.000", "1.008"], answer: "18.015", hint: "H=1.008, O=15.999." },
+    { q: "Which element is essential for thyroid health?", options: ["I", "F", "Cl", "Br"], answer: "I", hint: "Halogen in trace amounts." },
+    { q: "Which element is used in batteries and medicine?", options: ["Li", "Na", "K", "Ca"], answer: "Li", hint: "Light alkali metal." },
+    { q: "Which noble gas is used in neon signs?", options: ["Ne", "He", "Ar", "Kr"], answer: "Ne", hint: "Name matches the sign itself." },
+  { q: "Which element is used in fireworks for green color?", options: ["Ba", "Cu", "K", "Li"], answer: "Ba", hint: "Alkaline earth metal." },
+  { q: "Which element is used in balloons to make them float?", options: ["He", "H", "Ne", "Ar"], answer: "He", hint: "Light, inert gas." },
+  { q: "Which element is used in LEDs for red light?", options: ["Ga", "Al", "In", "P"], answer: "Ga", hint: "Post-transition metal." },
+  { q: "Which element is used in nuclear weapons?", options: ["U", "Pu", "Th", "All of the above"], answer: "All of the above", hint: "Actinides." },
+  { q: "Which element is used in antiseptic creams?", options: ["B", "Cl", "I", "F"], answer: "B", hint: "Metalloid with antiseptic properties." },
+  { q: "Which element is used in pencils?", options: ["C", "B", "Si", "Al"], answer: "C", hint: "Graphite form." },
+  { q: "Which element is used in fireworks for white color?", options: ["Al", "Mg", "Ti", "Zn"], answer: "Al", hint: "Light metal burns bright." },
+  { q: "Which element is used in thermite welding?", options: ["Al", "Fe", "Cu", "Mg"], answer: "Al", hint: "Reduces iron oxide." },
+  { q: "Which element is used in fluorescent lamps?", options: ["Hg", "Ne", "Ar", "Kr"], answer: "Hg", hint: "Liquid metal vapor." },
+  { q: "Which element is used in producing Teflon?", options: ["F", "Cl", "Br", "I"], answer: "F", hint: "Highly reactive halogen." },
+  { q: "Which element is used in atomic clocks?", options: ["Cs", "Rb", "K", "Na"], answer: "Cs", hint: "Alkali metal." },
+  { q: "Which element is used in nuclear reactors?", options: ["U", "Th", "Pu", "All of the above"], answer: "All of the above", hint: "Actinides." },
+  { q: "Which element is used in dental fillings?", options: ["Hg", "Ag", "Sn", "Cu"], answer: "Hg", hint: "Liquid metal used in amalgams." },
+  { q: "Which element is used in antiseptic water treatment?", options: ["Cl", "Br", "F", "I"], answer: "Cl", hint: "Halogen used in pools." },
+  { q: "Which element is used in stainless steel?", options: ["Cr", "Ni", "Fe", "Mn"], answer: "Cr", hint: "Adds corrosion resistance." },
+  { q: "Which element is used in solar cells?", options: ["Si", "Ge", "Cd", "Te"], answer: "Si", hint: "Semiconductor." },
+  { q: "Which element is used in photography?", options: ["Ag", "Cu", "Au", "Pb"], answer: "Ag", hint: "Silver halides are light-sensitive." },
+  { q: "Which element is essential for thyroid health?", options: ["I", "F", "Cl", "Br"], answer: "I", hint: "Halogen." },
+  { q: "Which element is used in smoke detectors?", options: ["Am", "Ra", "U", "Th"], answer: "Am", hint: "Radioactive." },
+  { q: "Which element is used in fireworks for blue color?", options: ["Cu", "Ba", "K", "Li"], answer: "Cu", hint: "Transition metal." },
+  { q: "Which element is used in MRI contrast agents?", options: ["Gd", "Fe", "Mn", "Cu"], answer: "Gd", hint: "Lanthanide." },
+  { q: "Which element is used in fire retardants?", options: ["Br", "Cl", "I", "F"], answer: "Br", hint: "Halogen." },
+  { q: "Which element is used in nuclear fuel?", options: ["U", "Th", "Pu", "All of the above"], answer: "All of the above", hint: "Actinides." },
+  { q: "Which element is used in food preservation?", options: ["N", "S", "Cl", "I"], answer: "N", hint: "Found in nitrates." },
+  { q: "Which element is used in toothpaste?", options: ["F", "Cl", "Br", "I"], answer: "F", hint: "Halogen." },
+  { q: "Which element is used in fireworks for yellow color?", options: ["Na", "K", "Li", "Cs"], answer: "Na", hint: "Alkali metal." },
+  { q: "Which element is used in producing matches?", options: ["P", "S", "Cl", "F"], answer: "P", hint: "Highly reactive nonmetal." },
+  { q: "Which element is used in LED displays?", options: ["In", "Ga", "Al", "Si"], answer: "In", hint: "Post-transition metal." },
+  { q: "Which element is used in semiconductors?", options: ["Si", "Ge", "B", "P"], answer: "Si", hint: "Metalloid." },
+  { q: "Which element is used in bronze?", options: ["Cu", "Sn", "Pb", "Zn"], answer: "Sn", hint: "Alloyed with copper." },
+  { q: "Which element is essential for red blood cells?", options: ["Fe", "Cu", "Zn", "Mg"], answer: "Fe", hint: "Found in hemoglobin." },
+  { q: "Which element is used in dental amalgam?", options: ["Hg", "Ag", "Sn", "Cu"], answer: "Hg", hint: "Liquid metal." },
+  { q: "Which element is used in neon signs?", options: ["Ne", "He", "Ar", "Kr"], answer: "Ne", hint: "Noble gas." },
+  { q: "Which element is used in reflective mirrors?", options: ["Ag", "Al", "Cu", "Au"], answer: "Ag", hint: "Shiny and reflective." },
+  { q: "Which element is used in medicine for thyroid treatment?", options: ["I", "F", "Cl", "Br"], answer: "I", hint: "Halogen." },
+  { q: "Which element is used in fireworks for purple color?", options: ["K", "Li", "Cs", "Ba"], answer: "K", hint: "Alkali metal." },
+  { q: "Which element is used in fire extinguishers?", options: ["Br", "Cl", "F", "I"], answer: "Br", hint: "Halogen-based." },
+  { q: "Which element is used in producing Teflon?", options: ["F", "Cl", "Br", "I"], answer: "F", hint: "Highly reactive halogen." },
+  { q: "Which element is used in MRI contrast agents?", options: ["Gd", "Fe", "Mn", "Cu"], answer: "Gd", hint: "Lanthanide." },
+  { q: "Which element is used in nuclear medicine imaging?", options: ["Tc", "I", "Xe", "Ra"], answer: "Tc", hint: "Technetium." },
+  { q: "Which element is used in street lights?", options: ["Na", "K", "Li", "Cs"], answer: "Na", hint: "Alkali metal." },
+  { q: "Which element is used in sunscreen creams?", options: ["Zn", "Ti", "Al", "Mg"], answer: "Zn", hint: "Blocks UV rays." },
+  { q: "Which element is used in producing steel alloys?", options: ["Cr", "Ni", "Mn", "All of the above"], answer: "All of the above", hint: "Transition metals." },
+  { q: "Which element is used in dental fillings to prevent decay?", options: ["Hg", "Ag", "Sn", "Cu"], answer: "Hg", hint: "Liquid metal." },
+  { q: "Which element is used in fireworks for orange color?", options: ["Ca", "Na", "K", "Li"], answer: "Ca", hint: "Alkaline earth metal." },
+  { q: "Which element is used in the production of glass?", options: ["Si", "B", "Al", "Ca"], answer: "Si", hint: "Metalloid." },
+  { q: "Which element is used in atomic clocks?", options: ["Cs", "Rb", "K", "Na"], answer: "Cs", hint: "Alkali metal." },
+  { q: "Which element is used in smoke detectors?", options: ["Am", "Ra", "U", "Th"], answer: "Am", hint: "Radioactive." },
+  { q: "Which element is used in making mirrors?", options: ["Ag", "Al", "Cu", "Au"], answer: "Ag", hint: "Highly reflective metal." },
+  { q: "Which element is essential for bone health?", options: ["Ca", "Mg", "K", "Na"], answer: "Ca", hint: "Alkaline earth metal." },
+  { q: "Which element is used in fireworks for white sparks?", options: ["Mg", "Al", "Ti", "Zn"], answer: "Mg", hint: "Light metal burns bright." },
+  { q: "Which element is used in photographic film?", options: ["Ag", "Cu", "Pb", "Zn"], answer: "Ag", hint: "Silver halides." },
+  { q: "Which element is used in producing fertilizers?", options: ["N", "P", "K", "All of the above"], answer: "All of the above", hint: "Essential macronutrients." },
+  { q: "Which element is used in lasers?", options: ["He", "Ne", "Ar", "Kr"], answer: "Ne", hint: "Noble gas." },
+  { q: "Which element is used in fuel cells?", options: ["H", "O", "N", "C"], answer: "H", hint: "Lightest element." },
+  { q: "Which element is used in semiconductors?", options: ["Si", "Ge", "B", "P"], answer: "Si", hint: "Metalloid." },
+  { q: "Which element is used in sunscreen and cosmetics?", options: ["Zn", "Ti", "Al", "Mg"], answer: "Zn", hint: "Blocks UV rays." },
+  { q: "Which element is used in dental amalgams?", options: ["Hg", "Ag", "Sn", "Cu"], answer: "Hg", hint: "Liquid metal." },
+  { q: "Which element is used in firework green sparks?", options: ["Ba", "Cu", "K", "Li"], answer: "Ba", hint: "Alkaline earth metal." },
+  { q: "Which element is used in sodium-vapor street lamps?", options: ["Na", "K", "Li", "Cs"], answer: "Na", hint: "Alkali metal." }
+  ];
+
+  let quizPool = [];
+  let currentQuizIndex = 0;
+  let score = 0;
+
+  function shuffleArray(arr) {
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  }
+
+  function startQuiz() {
+    let count = document.getElementById('quizCountSelect').value === 'all' ? quizQuestions.length : parseInt(document.getElementById('quizCountSelect').value);
+    quizPool = shuffleArray([...quizQuestions]).slice(0, count);
+    currentQuizIndex = 0;
+    score = 0;
+    loadQuiz();
+    document.getElementById('quizContainer').style.display = 'block';
+  }
+
+  document.getElementById('startQuizBtn').addEventListener('click', startQuiz);
+
+  function loadQuiz() {
+    if(currentQuizIndex >= quizPool.length){
+      document.getElementById("quizQuestion").textContent = "🎉 Quiz Completed!";
+      document.getElementById("quizOptions").innerHTML = "";
+      document.getElementById("quizFeedback").textContent = "";
+      document.getElementById("quizScore").textContent = `Your Score: ${score} / ${quizPool.length}`;
+      document.getElementById("nextQuestionBtn").style.display = "none";
+      return;
+    }
+
+    const q = quizPool[currentQuizIndex];
+    document.getElementById("quizQuestion").textContent = q.q;
+    const optionsDiv = document.getElementById("quizOptions");
+    optionsDiv.innerHTML = "";
+
+    q.options.forEach(opt => {
+      const btn = document.createElement("button");
+      btn.textContent = opt;
+      btn.style.cssText = `
+        padding: 15px 20px;
+        background: linear-gradient(45deg, #ffffff, #f8f9fa);
+        border: 2px solid #e9ecef;
+        border-radius: 10px;
+        font-size: 1.1em;
+        font-weight: bold;
+        color: #2c3e50;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      `;
+      btn.onmouseover = () => {
+        btn.style.background = 'linear-gradient(45deg, #3498db, #2980b9)';
+        btn.style.color = 'white';
+        btn.style.transform = 'translateY(-2px)';
+        btn.style.boxShadow = '0 4px 15px rgba(52,152,219,0.3)';
+      };
+      btn.onmouseout = () => {
+        btn.style.background = 'linear-gradient(45deg, #ffffff, #f8f9fa)';
+        btn.style.color = '#2c3e50';
+        btn.style.transform = 'translateY(0)';
+        btn.style.boxShadow = '0 2px 8px rgba(0,0,0,0.1)';
+      };
+      btn.onclick = () => checkAnswer(opt);
+      optionsDiv.appendChild(btn);
+    });
+
+    document.getElementById("quizFeedback").textContent = "";
+    document.getElementById("nextQuestionBtn").style.display = "none";
+    document.getElementById("quizScore").textContent = `Question ${currentQuizIndex+1} of ${quizPool.length}`;
+  }
+
+  function checkAnswer(selected){
+    const q = quizPool[currentQuizIndex];
+    const feedback = document.getElementById("quizFeedback");
+    if(selected === q.answer){
+      feedback.innerHTML = `<span style="color:#27ae60; font-size:1.2em;">✅ Correct!</span><br><span style="color:#2c3e50; font-size:1em;">${q.hint}</span>`;
+      feedback.style.background = "linear-gradient(45deg, #d4edda, #c3e6cb)";
+      feedback.style.border = "2px solid #27ae60";
+      score++;
+    } else {
+      feedback.innerHTML = `<span style="color:#e74c3c; font-size:1.2em;">❌ Wrong!</span><br><span style="color:#2c3e50; font-size:1em;">The answer is <strong>${q.answer}</strong>.<br>${q.hint}</span>`;
+      feedback.style.background = "linear-gradient(45deg, #f8d7da, #f5c6cb)";
+      feedback.style.border = "2px solid #e74c3c";
+    }
+    document.getElementById("nextQuestionBtn").style.display = "block";
+  }
+
+  document.getElementById("nextQuestionBtn").addEventListener("click", ()=>{
+    currentQuizIndex++;
+    loadQuiz();
+  });
+});
+
+// Gas Laws Calculator JavaScript
+document.addEventListener('DOMContentLoaded', function() {
+  // Button click handlers for different gas laws
+  document.getElementById('idealGasBtn').addEventListener('click', () => {
+    hideAllGasSections();
+    document.getElementById('idealGasSection').style.display = 'block';
+    updateGasButtonStyles('idealGasBtn');
+  });
+  
+  document.getElementById('boylesLawBtn').addEventListener('click', () => {
+    hideAllGasSections();
+    document.getElementById('boylesLawSection').style.display = 'block';
+    updateGasButtonStyles('boylesLawBtn');
+  });
+  
+  document.getElementById('charlesLawBtn').addEventListener('click', () => {
+    hideAllGasSections();
+    document.getElementById('charlesLawSection').style.display = 'block';
+    updateGasButtonStyles('charlesLawBtn');
+  });
+  
+  document.getElementById('combinedGasBtn').addEventListener('click', () => {
+    hideAllGasSections();
+    document.getElementById('combinedGasSection').style.display = 'block';
+    updateGasButtonStyles('combinedGasBtn');
+  });
+  
+  function hideAllGasSections() {
+    document.getElementById('idealGasSection').style.display = 'none';
+    document.getElementById('boylesLawSection').style.display = 'none';
+    document.getElementById('charlesLawSection').style.display = 'none';
+    document.getElementById('combinedGasSection').style.display = 'none';
+  }
+  
+  function updateGasButtonStyles(activeBtnId) {
+    document.querySelectorAll('.gasLawBtn').forEach(btn => {
+      btn.style.opacity = '0.7';
+      btn.style.transform = 'scale(0.95)';
+    });
+    document.getElementById(activeBtnId).style.opacity = '1';
+    document.getElementById(activeBtnId).style.transform = 'scale(1.05)';
+  }
+  
+  // Unit conversion functions
+  function convertPressure(value, fromUnit, toUnit) {
+    const conversions = {
+      atm: { kPa: 101.325, mmHg: 760, bar: 1.01325 },
+      kPa: { atm: 0.009869, mmHg: 7.5, bar: 0.01 },
+      mmHg: { atm: 0.001316, kPa: 0.133322, bar: 0.001333 },
+      bar: { atm: 0.986923, kPa: 100, mmHg: 750.062 }
+    };
+    
+    if (fromUnit === toUnit) return value;
+    if (conversions[fromUnit] && conversions[fromUnit][toUnit]) {
+      return value * conversions[fromUnit][toUnit];
+    }
+    return value;
+  }
+  
+  function convertVolume(value, fromUnit, toUnit) {
+    if (fromUnit === 'L' && toUnit === 'mL') return value * 1000;
+    if (fromUnit === 'mL' && toUnit === 'L') return value / 1000;
+    if (fromUnit === 'L' && toUnit === 'm3') return value / 1000;
+    if (fromUnit === 'm3' && toUnit === 'L') return value * 1000;
+    return value;
+  }
+  
+  function convertTemperature(value, fromUnit, toUnit) {
+    if (fromUnit === 'C' && toUnit === 'K') return value + 273.15;
+    if (fromUnit === 'K' && toUnit === 'C') return value - 273.15;
+    if (fromUnit === 'F' && toUnit === 'K') return (value - 32) * 5/9 + 273.15;
+    if (fromUnit === 'K' && toUnit === 'F') return (value - 273.15) * 9/5 + 32;
+    if (fromUnit === 'C' && toUnit === 'F') return value * 9/5 + 32;
+    if (fromUnit === 'F' && toUnit === 'C') return (value - 32) * 5/9;
+    return value;
+  }
+  
+  // Ideal Gas Law Calculator
+  document.getElementById('calculateIdealBtn').addEventListener('click', () => {
+    const pressure = parseFloat(document.getElementById('idealPressure').value);
+    const volume = parseFloat(document.getElementById('idealVolume').value);
+    const moles = parseFloat(document.getElementById('idealMoles').value);
+    const temp = parseFloat(document.getElementById('idealTemp').value);
+    const solveFor = document.getElementById('idealSolveFor').value;
+    const resultDiv = document.getElementById('idealResult');
+    
+    // Convert all values to standard units (atm, L, K)
+    const pressureUnit = document.getElementById('pressureUnit').value;
+    const volumeUnit = document.getElementById('volumeUnit').value;
+    const tempUnit = document.getElementById('tempUnit').value;
+    
+    const P = pressure ? convertPressure(pressure, pressureUnit, 'atm') : null;
+    const V = volume ? convertVolume(volume, volumeUnit, 'L') : null;
+    const n = moles || null;
+    const T = temp ? convertTemperature(temp, tempUnit, 'K') : null;
+    
+    const R = 0.0821; // L·atm/(mol·K)
+    let result, formula, calculation;
+    
+    if (solveFor === 'P' && V && n && T) {
+      result = (n * R * T) / V;
+      formula = 'P = nRT/V';
+      calculation = `P = (${n} mol × ${R} L·atm/(mol·K) × ${T.toFixed(2)} K) / ${V} L`;
+    } else if (solveFor === 'V' && P && n && T) {
+      result = (n * R * T) / P;
+      formula = 'V = nRT/P';
+      calculation = `V = (${n} mol × ${R} L·atm/(mol·K) × ${T.toFixed(2)} K) / ${P} atm`;
+    } else if (solveFor === 'n' && P && V && T) {
+      result = (P * V) / (R * T);
+      formula = 'n = PV/RT';
+      calculation = `n = (${P} atm × ${V} L) / (${R} L·atm/(mol·K) × ${T.toFixed(2)} K)`;
+    } else if (solveFor === 'T' && P && V && n) {
+      result = (P * V) / (n * R);
+      formula = 'T = PV/nR';
+      calculation = `T = (${P} atm × ${V} L) / (${n} mol × ${R} L·atm/(mol·K))`;
+    } else {
+      resultDiv.innerHTML = '<strong>⚠️ Error:</strong> Please enter values for all variables except the one you want to solve for.';
+      resultDiv.style.background = '#ffebee';
+      resultDiv.style.borderLeftColor = '#f44336';
+      return;
+    }
+    
+    const results = [
+      `<strong>⚗️ Ideal Gas Law Result:</strong>`,
+      `• <strong>Formula:</strong> ${formula}`,
+      `• <strong>Calculation:</strong> ${calculation}`,
+      `• <strong>Result:</strong> ${result.toFixed(4)} ${solveFor === 'P' ? 'atm' : solveFor === 'V' ? 'L' : solveFor === 'n' ? 'mol' : 'K'}`
+    ];
+    
+    resultDiv.innerHTML = results.join('<br>');
+    resultDiv.style.background = '#e8f5e8';
+    resultDiv.style.borderLeftColor = '#4caf50';
+  });
+  
+  // Boyle's Law Calculator
+  document.getElementById('calculateBoyleBtn').addEventListener('click', () => {
+    const P1 = parseFloat(document.getElementById('boyleP1').value);
+    const V1 = parseFloat(document.getElementById('boyleV1').value);
+    const P2 = parseFloat(document.getElementById('boyleP2').value);
+    const V2 = parseFloat(document.getElementById('boyleV2').value);
+    const solveFor = document.getElementById('boyleSolveFor').value;
+    const resultDiv = document.getElementById('boyleResult');
+    
+    const P1Unit = document.getElementById('boylePUnit').value;
+    const V1Unit = document.getElementById('boyleVUnit').value;
+    
+    const P1_std = convertPressure(P1, P1Unit, 'atm');
+    const V1_std = convertVolume(V1, V1Unit, 'L');
+    
+    let result, formula, calculation;
+    
+    if (solveFor === 'P2' && P1 && V1 && V2) {
+      result = (P1_std * V1_std) / convertVolume(V2, V1Unit, 'L');
+      formula = 'P₂ = P₁V₁/V₂';
+      calculation = `P₂ = (${P1_std.toFixed(3)} atm × ${V1_std.toFixed(3)} L) / ${convertVolume(V2, V1Unit, 'L').toFixed(3)} L`;
+    } else if (solveFor === 'V2' && P1 && V1 && P2) {
+      result = (P1_std * V1_std) / convertPressure(P2, P1Unit, 'atm');
+      formula = 'V₂ = P₁V₁/P₂';
+      calculation = `V₂ = (${P1_std.toFixed(3)} atm × ${V1_std.toFixed(3)} L) / ${convertPressure(P2, P1Unit, 'atm').toFixed(3)} atm`;
+    } else {
+      resultDiv.innerHTML = '<strong>⚠️ Error:</strong> Please enter values for three variables to solve for the fourth.';
+      resultDiv.style.background = '#ffebee';
+      resultDiv.style.borderLeftColor = '#f44336';
+      return;
+    }
+    
+    const results = [
+      `<strong>📊 Boyle's Law Result:</strong>`,
+      `• <strong>Formula:</strong> ${formula}`,
+      `• <strong>Calculation:</strong> ${calculation}`,
+      `• <strong>Result:</strong> ${result.toFixed(4)} ${solveFor === 'P2' ? 'atm' : 'L'}`
+    ];
+    
+    resultDiv.innerHTML = results.join('<br>');
+    resultDiv.style.background = '#e8f5e8';
+    resultDiv.style.borderLeftColor = '#4caf50';
+  });
+  
+  // Charles's Law Calculator
+  document.getElementById('calculateCharlesBtn').addEventListener('click', () => {
+    const V1 = parseFloat(document.getElementById('charlesV1').value);
+    const T1 = parseFloat(document.getElementById('charlesT1').value);
+    const V2 = parseFloat(document.getElementById('charlesV2').value);
+    const T2 = parseFloat(document.getElementById('charlesT2').value);
+    const solveFor = document.getElementById('charlesSolveFor').value;
+    const resultDiv = document.getElementById('charlesResult');
+    
+    const V1Unit = document.getElementById('charlesVUnit').value;
+    const T1Unit = document.getElementById('charlesTUnit').value;
+    
+    const V1_std = convertVolume(V1, V1Unit, 'L');
+    const T1_std = convertTemperature(T1, T1Unit, 'K');
+    
+    let result, formula, calculation;
+    
+    if (solveFor === 'V2' && V1 && T1 && T2) {
+      result = (V1_std * convertTemperature(T2, T1Unit, 'K')) / T1_std;
+      formula = 'V₂ = V₁T₂/T₁';
+      calculation = `V₂ = (${V1_std.toFixed(3)} L × ${convertTemperature(T2, T1Unit, 'K').toFixed(2)} K) / ${T1_std.toFixed(2)} K`;
+    } else if (solveFor === 'T2' && V1 && T1 && V2) {
+      result = (T1_std * convertVolume(V2, V1Unit, 'L')) / V1_std;
+      formula = 'T₂ = T₁V₂/V₁';
+      calculation = `T₂ = (${T1_std.toFixed(2)} K × ${convertVolume(V2, V1Unit, 'L').toFixed(3)} L) / ${V1_std.toFixed(3)} L`;
+    } else {
+      resultDiv.innerHTML = '<strong>⚠️ Error:</strong> Please enter values for three variables to solve for the fourth.';
+      resultDiv.style.background = '#ffebee';
+      resultDiv.style.borderLeftColor = '#f44336';
+      return;
+    }
+    
+    const results = [
+      `<strong>🌡️ Charles's Law Result:</strong>`,
+      `• <strong>Formula:</strong> ${formula}`,
+      `• <strong>Calculation:</strong> ${calculation}`,
+      `• <strong>Result:</strong> ${result.toFixed(4)} ${solveFor === 'V2' ? 'L' : 'K'}`
+    ];
+    
+    resultDiv.innerHTML = results.join('<br>');
+    resultDiv.style.background = '#e8f5e8';
+    resultDiv.style.borderLeftColor = '#4caf50';
+  });
+  
+  // Combined Gas Law Calculator
+  document.getElementById('calculateCombinedBtn').addEventListener('click', () => {
+    const P1 = parseFloat(document.getElementById('combinedP1').value);
+    const V1 = parseFloat(document.getElementById('combinedV1').value);
+    const T1 = parseFloat(document.getElementById('combinedT1').value);
+    const P2 = parseFloat(document.getElementById('combinedP2').value);
+    const V2 = parseFloat(document.getElementById('combinedV2').value);
+    const T2 = parseFloat(document.getElementById('combinedT2').value);
+    const solveFor = document.getElementById('combinedSolveFor').value;
+    const resultDiv = document.getElementById('combinedResult');
+    
+    const P1Unit = document.getElementById('combinedPUnit').value;
+    const V1Unit = document.getElementById('combinedVUnit').value;
+    const T1Unit = document.getElementById('combinedTUnit').value;
+    
+    const P1_std = convertPressure(P1, P1Unit, 'atm');
+    const V1_std = convertVolume(V1, V1Unit, 'L');
+    const T1_std = convertTemperature(T1, T1Unit, 'K');
+    
+    let result, formula, calculation;
+    
+    if (solveFor === 'P2' && P1 && V1 && T1 && V2 && T2) {
+      result = (P1_std * V1_std * convertTemperature(T2, T1Unit, 'K')) / (T1_std * convertVolume(V2, V1Unit, 'L'));
+      formula = 'P₂ = P₁V₁T₂/(T₁V₂)';
+      calculation = `P₂ = (${P1_std.toFixed(3)} atm × ${V1_std.toFixed(3)} L × ${convertTemperature(T2, T1Unit, 'K').toFixed(2)} K) / (${T1_std.toFixed(2)} K × ${convertVolume(V2, V1Unit, 'L').toFixed(3)} L)`;
+    } else if (solveFor === 'V2' && P1 && V1 && T1 && P2 && T2) {
+      result = (P1_std * V1_std * convertTemperature(T2, T1Unit, 'K')) / (T1_std * convertPressure(P2, P1Unit, 'atm'));
+      formula = 'V₂ = P₁V₁T₂/(T₁P₂)';
+      calculation = `V₂ = (${P1_std.toFixed(3)} atm × ${V1_std.toFixed(3)} L × ${convertTemperature(T2, T1Unit, 'K').toFixed(2)} K) / (${T1_std.toFixed(2)} K × ${convertPressure(P2, P1Unit, 'atm').toFixed(3)} atm)`;
+    } else if (solveFor === 'T2' && P1 && V1 && T1 && P2 && V2) {
+      result = (T1_std * convertPressure(P2, P1Unit, 'atm') * convertVolume(V2, V1Unit, 'L')) / (P1_std * V1_std);
+      formula = 'T₂ = T₁P₂V₂/(P₁V₁)';
+      calculation = `T₂ = (${T1_std.toFixed(2)} K × ${convertPressure(P2, P1Unit, 'atm').toFixed(3)} atm × ${convertVolume(V2, V1Unit, 'L').toFixed(3)} L) / (${P1_std.toFixed(3)} atm × ${V1_std.toFixed(3)} L)`;
+    } else {
+      resultDiv.innerHTML = '<strong>⚠️ Error:</strong> Please enter values for five variables to solve for the sixth.';
+      resultDiv.style.background = '#ffebee';
+      resultDiv.style.borderLeftColor = '#f44336';
+      return;
+    }
+    
+    const results = [
+      `<strong>🔄 Combined Gas Law Result:</strong>`,
+      `• <strong>Formula:</strong> ${formula}`,
+      `• <strong>Calculation:</strong> ${calculation}`,
+      `• <strong>Result:</strong> ${result.toFixed(4)} ${solveFor === 'P2' ? 'atm' : solveFor === 'V2' ? 'L' : 'K'}`
+    ];
+    
+    resultDiv.innerHTML = results.join('<br>');
+    resultDiv.style.background = '#e8f5e8';
+    resultDiv.style.borderLeftColor = '#4caf50';
+  });
+});
+</script>
+
+<script>
+// Complete 118 elements data
+const elements = {
+H:{mass:1.008,group:'nonmetal',desc:"Hydrogen is the lightest element, essential for life.",use:"Fuel cells, water production, hydrogenated foods."},
+He:{mass:4.0026,group:'noble',desc:"Helium is inert and lighter than air.",use:"Balloons, cryogenics."},
+Li:{mass:6.94,group:'alkali',desc:"Lithium is a soft, reactive metal.",use:"Batteries, medicine."},
+Be:{mass:9.0122,group:'alkaline',desc:"Beryllium is strong and lightweight.",use:"Aerospace components, X-ray windows."},
+B:{mass:10.81,group:'metalloid',desc:"Boron is a metalloid with antiseptic properties.",use:"Glass, detergents, fertilizers."},
+C:{mass:12.011,group:'nonmetal',desc:"Carbon is essential for life.",use:"Fuels, pencils, steel production."},
+N:{mass:14.007,group:'nonmetal',desc:"Nitrogen makes up 78% of the atmosphere.",use:"Fertilizers, food packaging."},
+O:{mass:15.999,group:'nonmetal',desc:"Oxygen is essential for respiration.",use:"Medical therapy, welding, water treatment."},
+F:{mass:18.998,group:'halogen',desc:"Fluorine is highly reactive.",use:"Toothpaste, Teflon."},
+Ne:{mass:20.180,group:'noble',desc:"Neon is inert and glows in discharge tubes.",use:"Neon signs, indicators."},
+Na:{mass:22.990,group:'alkali',desc:"Sodium is a reactive soft metal.",use:"Street lights, soap, table salt."},
+Mg:{mass:24.305,group:'alkaline',desc:"Magnesium is lightweight and essential.",use:"Alloys, fireworks, supplements."},
+Al:{mass:26.982,group:'post-transition',desc:"Aluminum is light and corrosion-resistant.",use:"Cans, foils, aircraft."},
+Si:{mass:28.085,group:'metalloid',desc:"Silicon is a semiconductor.",use:"Electronics, glass, solar panels."},
+P:{mass:30.974,group:'nonmetal',desc:"Phosphorus is reactive and essential.",use:"Fertilizers, matches, detergents."},
+S:{mass:32.06,group:'nonmetal',desc:"Sulfur is yellow and odoriferous.",use:"Fertilizers, chemicals, rubber vulcanization."},
+Cl:{mass:35.45,group:'halogen',desc:"Chlorine is a greenish gas.",use:"Disinfectants, PVC, swimming pools."},
+Ar:{mass:39.948,group:'noble',desc:"Argon is inert.",use:"Welding, light bulbs, labs."},
+K:{mass:39.098,group:'alkali',desc:"Potassium is highly reactive.",use:"Fertilizers, soap, medicine."},
+Ca:{mass:40.078,group:'alkaline',desc:"Calcium is essential for bones.",use:"Cement, supplements, lime production."},
+Sc:{mass:44.956,group:'transition',desc:"Scandium is rare and lightweight.",use:"Aerospace alloys, electronics."},
+Ti:{mass:47.867,group:'transition',desc:"Titanium is strong and corrosion-resistant.",use:"Aircraft, medical implants."},
+V:{mass:50.942,group:'transition',desc:"Vanadium is hard metal.",use:"Steel alloys, catalysts."},
+Cr:{mass:51.996,group:'transition',desc:"Chromium is shiny and corrosion-resistant.",use:"Stainless steel, plating."},
+Mn:{mass:54.938,group:'transition',desc:"Manganese improves steel strength.",use:"Alloys, batteries."},
+Fe:{mass:55.845,group:'transition',desc:"Iron is magnetic and strong.",use:"Construction, machinery."},
+Co:{mass:58.933,group:'transition',desc:"Cobalt is magnetic.",use:"Alloys, batteries, pigments."},
+Ni:{mass:58.693,group:'transition',desc:"Nickel is corrosion-resistant.",use:"Coins, batteries, alloys."},
+Cu:{mass:63.546,group:'transition',desc:"Copper is conductive.",use:"Wiring, plumbing, coins."},
+Zn:{mass:65.38,group:'transition',desc:"Zinc is corrosion-resistant.",use:"Galvanization, batteries, alloys."},
+Ga:{mass:69.723,group:'post-transition',desc:"Gallium melts in hand.",use:"Semiconductors, LEDs."},
+Ge:{mass:72.63,group:'metalloid',desc:"Germanium is a semiconductor.",use:"Electronics, optics."},
+As:{mass:74.922,group:'metalloid',desc:"Arsenic is toxic.",use:"Pesticides, semiconductors."},
+Se:{mass:78.971,group:'nonmetal',desc:"Selenium is essential in small amounts.",use:"Electronics, glass coloring."},
+Br:{mass:79.904,group:'halogen',desc:"Bromine is red-brown liquid.",use:"Flame retardants, chemicals."},
+Kr:{mass:83.798,group:'noble',desc:"Krypton is inert.",use:"Lighting, lasers."},
+Rb:{mass:85.468,group:'alkali',desc:"Rubidium is soft and reactive.",use:"Research, atomic clocks."},
+Sr:{mass:87.62,group:'alkaline',desc:"Strontium gives red color to fireworks.",use:"Fireworks, magnets."},
+Y:{mass:88.906,group:'transition',desc:"Yttrium is rare earth.",use:"LEDs, phosphors, superconductors."},
+Zr:{mass:91.224,group:'transition',desc:"Zirconium is corrosion-resistant.",use:"Nuclear reactors, ceramics."},
+Nb:{mass:92.906,group:'transition',desc:"Niobium strengthens steel.",use:"Superalloys, superconductors."},
+Mo:{mass:95.95,group:'transition',desc:"Molybdenum is corrosion-resistant.",use:"Alloys, lubricants."},
+Tc:{mass:98,group:'transition',desc:"Technetium is radioactive.",use:"Medical imaging."},
+Ru:{mass:101.07,group:'transition',desc:"Ruthenium is hard metal.",use:"Electronics, catalysts."},
+Rh:{mass:102.91,group:'transition',desc:"Rhodium is precious.",use:"Catalysts, jewelry."},
+Pd:{mass:106.42,group:'transition',desc:"Palladium is precious.",use:"Catalysts, electronics."},
+Ag:{mass:107.87,group:'transition',desc:"Silver is precious and conductive.",use:"Jewelry, electronics, coins."},
+Cd:{mass:112.41,group:'transition',desc:"Cadmium is toxic.",use:"Batteries, pigments."},
+In:{mass:114.82,group:'post-transition',desc:"Indium is soft metal.",use:"Semiconductors, coatings."},
+Sn:{mass:118.71,group:'post-transition',desc:"Tin is corrosion-resistant.",use:"Cans, alloys."},
+Sb:{mass:121.76,group:'metalloid',desc:"Antimony is brittle metalloid.",use:"Flame retardants, alloys."},
+Te:{mass:127.60,group:'metalloid',desc:"Tellurium is rare metalloid.",use:"Alloys, semiconductors."},
+I:{mass:126.90,group:'halogen',desc:"Iodine is essential for thyroid.",use:"Disinfectants, supplements."},
+Xe:{mass:131.29,group:'noble',desc:"Xenon is inert gas.",use:"Lighting, anesthesia."},
+Cs:{mass:132.91,group:'alkali',desc:"Cesium is soft and reactive.",use:"Atomic clocks, research."},
+Ba:{mass:137.33,group:'alkaline',desc:"Barium is dense metal.",use:"X-ray contrast agents, fireworks."},
+La:{mass:138.91,group:'lanthanide',desc:"Lanthanum is rare earth.",use:"Camera lenses, catalysts."},
+Ce:{mass:140.12,group:'lanthanide',desc:"Cerium is rare earth.",use:"Catalysts, glass polishing."},
+Pr:{mass:140.91,group:'lanthanide',desc:"Praseodymium is rare earth.",use:"Magnets, aircraft engines."},
+Nd:{mass:144.24,group:'lanthanide',desc:"Neodymium is used in strong magnets.",use:"Magnets, microphones."},
+Pm:{mass:145,group:'lanthanide',desc:"Promethium is radioactive.",use:"Research, luminous paint."},
+Sm:{mass:150.36,group:'lanthanide',desc:"Samarium is rare earth.",use:"Magnets, nuclear reactors."},
+Eu:{mass:151.96,group:'lanthanide',desc:"Europium is rare earth.",use:"LEDs, phosphors."},
+Gd:{mass:157.25,group:'lanthanide',desc:"Gadolinium is magnetic.",use:"MRI contrast, magnets."},
+Tb:{mass:158.93,group:'lanthanide',desc:"Terbium is rare earth.",use:"LEDs, phosphors."},
+Dy:{mass:162.50,group:'lanthanide',desc:"Dysprosium is rare earth.",use:"Magnets, nuclear reactors."},
+Ho:{mass:164.93,group:'lanthanide',desc:"Holmium is rare earth.",use:"Magnets, lasers."},
+Er:{mass:167.26,group:'lanthanide',desc:"Erbium is rare earth.",use:"Fiber optics, lasers."},
+Tm:{mass:168.93,group:'lanthanide',desc:"Thulium is rare earth.",use:"Lasers, medical devices."},
+Yb:{mass:173.05,group:'lanthanide',desc:"Ytterbium is rare earth.",use:"Research, lasers."},
+Lu:{mass:174.97,group:'lanthanide',desc:"Lutetium is rare earth.",use:"PET scanners, catalysts."},
+Hf:{mass:178.49,group:'transition',desc:"Hafnium is corrosion-resistant.",use:"Nuclear reactors, alloys."},
+Ta:{mass:180.95,group:'transition',desc:"Tantalum is corrosion-resistant.",use:"Electronics, surgical implants."},
+W:{mass:183.84,group:'transition',desc:"Tungsten is very dense.",use:"Filaments, cutting tools."},
+Re:{mass:186.21,group:'transition',desc:"Rhenium is dense metal.",use:"Superalloys, catalysts."},
+Os:{mass:190.23,group:'transition',desc:"Osmium is dense.",use:"Alloys, fountain pen tips."},
+Ir:{mass:192.22,group:'transition',desc:"Iridium is dense and corrosion-resistant.",use:"Spark plugs, electronics."},
+Pt:{mass:195.08,group:'transition',desc:"Platinum is precious.",use:"Catalysts, jewelry, lab equipment."},
+Au:{mass:196.97,group:'transition',desc:"Gold is non-reactive and precious.",use:"Jewelry, electronics, investment."},
+Hg:{mass:200.59,group:'transition',desc:"Mercury is liquid metal.",use:"Thermometers, switches."},
+Tl:{mass:204.38,group:'post-transition',desc:"Thallium is toxic.",use:"Electronics, research."},
+Pb:{mass:207.2,group:'post-transition',desc:"Lead is dense and toxic.",use:"Batteries, radiation shielding."},
+Bi:{mass:208.98,group:'post-transition',desc:"Bismuth is low-toxicity metal.",use:"Cosmetics, alloys, medicines."},
+Po:{mass:209,group:'post-transition',desc:"Polonium is radioactive.",use:"Research, antistatic devices."},
+At:{mass:210,group:'halogen',desc:"Astatine is radioactive.",use:"Research."},
+Rn:{mass:222,group:'noble',desc:"Radon is radioactive gas.",use:"Research, radon therapy."},
+Fr:{mass:223,group:'alkali',desc:"Francium is highly radioactive.",use:"Research."},
+Ra:{mass:226,group:'alkaline',desc:"Radium is radioactive.",use:"Research, luminescent paints."},
+Ac:{mass:227,group:'actinide',desc:"Actinium is radioactive.",use:"Research."},
+Th:{mass:232.04,group:'actinide',desc:"Thorium is radioactive.",use:"Nuclear fuel, research."},
+Pa:{mass:231.04,group:'actinide',desc:"Protactinium is radioactive.",use:"Research."},
+U:{mass:238.03,group:'actinide',desc:"Uranium is radioactive.",use:"Nuclear fuel, research."},
+Np:{mass:237,group:'actinide',desc:"Neptunium is radioactive.",use:"Research."},
+Pu:{mass:244,group:'actinide',desc:"Plutonium is radioactive.",use:"Nuclear fuel, research."},
+Am:{mass:243,group:'actinide',desc:"Americium is radioactive.",use:"Smoke detectors, research."},
+Cm:{mass:247,group:'actinide',desc:"Curium is radioactive.",use:"Research."},
+Bk:{mass:247,group:'actinide',desc:"Berkelium is radioactive.",use:"Research."},
+Cf:{mass:251,group:'actinide',desc:"Californium is radioactive.",use:"Research, neutron source."},
+Es:{mass:252,group:'actinide',desc:"Einsteinium is radioactive.",use:"Research."},
+Fm:{mass:257,group:'actinide',desc:"Fermium is radioactive.",use:"Research."},
+Md:{mass:258,group:'actinide',desc:"Mendelevium is radioactive.",use:"Research."},
+No:{mass:259,group:'actinide',desc:"Nobelium is radioactive.",use:"Research."},
+Lr:{mass:262,group:'actinide',desc:"Lawrencium is radioactive.",use:"Research."},
+Rf:{mass:267,group:'transition',desc:"Rutherfordium is radioactive.",use:"Research."},
+Db:{mass:270,group:'transition',desc:"Dubnium is radioactive.",use:"Research."},
+Sg:{mass:271,group:'transition',desc:"Seaborgium is radioactive.",use:"Research."},
+Bh:{mass:270,group:'transition',desc:"Bohrium is radioactive.",use:"Research."},
+Hs:{mass:277,group:'transition',desc:"Hassium is radioactive.",use:"Research."},
+Mt:{mass:278,group:'transition',desc:"Meitnerium is radioactive.",use:"Research."},
+Ds:{mass:281,group:'transition',desc:"Darmstadtium is radioactive.",use:"Research."},
+Rg:{mass:282,group:'transition',desc:"Roentgenium is radioactive.",use:"Research."},
+Cn:{mass:285,group:'transition',desc:"Copernicium is radioactive.",use:"Research."},
+Fl:{mass:289,group:'post-transition',desc:"Flerovium is radioactive.",use:"Research."},
+Lv:{mass:293,group:'post-transition',desc:"Livermorium is radioactive.",use:"Research."},
+Ts:{mass:294,group:'halogen',desc:"Tennessine is radioactive.",use:"Research."},
+Og:{mass:294,group:'noble',desc:"Oganesson is radioactive.",use:"Research."}
+};
+
+const groupColors = {
+'nonmetal':'#8dd3c7','noble':'#ffffb3','alkali':'#fb8072','alkaline':'#80b1d3','halogen':'#fdb462',
+'metalloid':'#b3de69','transition':'#fccde5','post-transition':'#d9d9d9','lanthanide':'#bc80bd','actinide':'#ffed6f'
+};
+
+// Render periodic table
+const tableDiv = document.getElementById('periodicTable');
+Object.keys(elements).forEach(sym=>{
+  const e = elements[sym];
+  const elDiv = document.createElement('div');
+  elDiv.textContent = sym;
+  elDiv.title = `${sym} - ${e.mass} g/mol`;
+  elDiv.style.backgroundColor = groupColors[e.group] || '#eee';
+  elDiv.addEventListener('click',()=> displayElementInfo(sym));
+  tableDiv.appendChild(elDiv);
+});
+
+// Display element info
+function displayElementInfo(sym){
+  const e = elements[sym];
+  const infoDiv = document.getElementById('elementInfo');
+  infoDiv.style.display="block";
+  infoDiv.style.background = "#e3f2fd";
+  infoDiv.style.borderLeftColor = "#2196f3";
+  infoDiv.innerHTML=`<strong>🔬 ${sym} (Element Information)</strong><br><br>
+  <strong>⚛️ Atomic Mass:</strong> ${e.mass} g/mol<br>
+  <strong>📊 Group:</strong> ${e.group}<br>
+  <strong>📝 Description:</strong> ${e.desc}<br>
+  <strong>🏭 Daily Uses:</strong> ${e.use}`;
+}
+
+// Molar mass calculator
+function calculateMolarMass(formula){
+  const regex=/([A-Za-z]+)(\d*)/g;
+  let match, total=0, breakdown=[];
+  formula = formula.replace(/\s+/g,''); // remove spaces
+  formula = formula.replace(/([a-z])/g,m=>m.toUpperCase()); // capitalize single letters
+  while(match=regex.exec(formula)){
+    const elem = match[1][0] + (match[1][1]?match[1][1].toLowerCase():'');
+    const count = parseInt(match[2]) || 1;
+    if(!elements[elem]) return {error:`Element "${elem}" not found.`};
+    const mass = elements[elem].mass * count;
+    total += mass;
+    breakdown.push(`${elem} (${elements[elem].mass} × ${count}) = ${mass.toFixed(3)} g/mol`);
+  }
+  return {total:total.toFixed(3), breakdown};
+}
+
+document.getElementById('calculateBtn').addEventListener('click',()=>{
+  const formula = document.getElementById('formulaInput').value.trim();
+  const res = document.getElementById('result');
+  const breakdownDiv = document.getElementById('breakdown');
+  if(!formula){ 
+    res.innerHTML = "<strong>⚠️ Error:</strong> Please enter a chemical formula."; 
+    res.style.background = "#ffebee"; 
+    res.style.borderLeftColor = "#f44336";
+    breakdownDiv.style.display="none"; 
+    return;
+  }
+  const result = calculateMolarMass(formula);
+  if(result.error){ 
+    res.innerHTML = `<strong>⚠️ Error:</strong> ${result.error}`; 
+    res.style.background = "#ffebee"; 
+    res.style.borderLeftColor = "#f44336";
+    breakdownDiv.style.display="none"; 
+    return;
+  }
+  res.innerHTML = `<strong>✅ Molar Mass:</strong> ${result.total} g/mol`;
+  res.style.background = "#e8f5e8"; 
+  res.style.borderLeftColor = "#4caf50";
+  breakdownDiv.innerHTML = "<strong>📊 Breakdown:</strong><br>" + result.breakdown.join("<br>");
+  breakdownDiv.style.display="block";
+});
+
+// Chemical Equation Balancer
+function parseCompound(compound) {
+  let counts = {};
+  let i = 0;
+  function parse(mult = 1) {
+    let elem = '', count = '', stack = [];
+    while (i < compound.length) {
+      let c = compound[i];
+      if (c === '(') {
+        i++;
+        let group = parse();
+        let num = '';
+        while (i < compound.length && /[0-9]/.test(compound[i])) num += compound[i++];
+        let groupMult = parseInt(num) || 1;
+        for (let e in group) {
+          stack[e] = (stack[e] || 0) + group[e] * groupMult;
+        }
+      } else if (c === ')') {
+        i++;
+        break;
+      } else if (/[A-Za-z]/.test(c)) {
+        if (elem) {
+          stack[elem] = (stack[elem] || 0) + (parseInt(count) || 1);
+          elem = '';
+          count = '';
+        }
+        let sym = c.toUpperCase();
+        if (i + 1 < compound.length && /[a-zA-Z]/.test(compound[i + 1])) {
+          let two = sym + compound[i + 1].toLowerCase();
+          if (elements[two]) {
+            elem = two;
+            i += 2;
+            continue;
+          }
+        }
+        elem = sym;
+        i++;
+      } else if (/[0-9]/.test(c)) {
+        count += c;
+        i++;
+      } else {
+        i++;
+      }
+    }
+    if (elem) {
+      stack[elem] = (stack[elem] || 0) + (parseInt(count) || 1);
+    }
+    if (mult > 1) {
+      for (let e in stack) stack[e] *= mult;
+    }
+    return stack;
+  }
+  i = 0;
+  return parse();
+}
+
+function parseEquation(equation) {
+  let arrowMatch = equation.match(/(->|=>|=|<=>)/);
+  if (!arrowMatch) return null;
+  let arrow = arrowMatch[0];
+  let [lhs, rhs] = equation.split(arrow).map(side => side.trim());
+  let left = lhs.split('+').map(s => s.trim()).filter(Boolean);
+  let right = rhs.split('+').map(s => s.trim()).filter(Boolean);
+  return { left, right, arrow };
+}
+
+function getElementList(equation) {
+  let set = new Set();
+  equation.left.concat(equation.right).forEach(comp => {
+    let counts = parseCompound(comp);
+    Object.keys(counts).forEach(e => set.add(e));
+  });
+  return Array.from(set);
+}
+
+function buildMatrix(equation, elements) {
+  let matrix = elements.map(e => []);
+  equation.left.forEach((comp, j) => {
+    let counts = parseCompound(comp);
+    elements.forEach((e, i) => matrix[i][j] = counts[e] || 0);
+  });
+  equation.right.forEach((comp, j) => {
+    let counts = parseCompound(comp);
+    elements.forEach((e, i) => matrix[i][j + equation.left.length] = -(counts[e] || 0));
+  });
+  return matrix;
+}
+
+function gcd(a, b) { return b ? gcd(b, a % b) : Math.abs(a); }
+function lcm(a, b) { return a && b ? Math.abs(a * b) / gcd(a, b) : 0; }
+
+function solveMatrix(matrix) {
+  let m = matrix.length, n = matrix[0].length;
+  let A = matrix.map(row => row.slice());
+  for (let i = 0; i < m; i++) {
+    let pivot = i;
+    while (pivot < n && A[i][pivot] === 0) pivot++;
+    if (pivot === n) continue;
+    let f = A[i][pivot];
+    for (let j = 0; j < n; j++) A[i][j] /= f;
+    for (let k = 0; k < m; k++) {
+      if (k !== i && A[k][pivot] !== 0) {
+        let factor = A[k][pivot];
+        for (let j = 0; j < n; j++) A[k][j] -= factor * A[i][j];
+      }
+    }
+  }
+  let coeffs = Array(n).fill(1);
+  for (let i = m - 1; i >= 0; i--) {
+    let idx = A[i].findIndex(x => Math.abs(x) > 1e-8);
+    if (idx === -1) continue;
+    let sum = 0;
+    for (let j = idx + 1; j < n; j++) sum += A[i][j] * coeffs[j];
+    coeffs[idx] = -sum;
+  }
+  let denoms = coeffs.map(x => {
+    let d = 1;
+    if (!Number.isInteger(x)) {
+      let s = x.toString();
+      if (s.includes('e')) return 1;
+      let dec = s.split('.')[1] || '';
+      d = Math.pow(10, dec.length);
+    }
+    return d;
+  });
+  let lcmAll = denoms.reduce((a, b) => lcm(a, b), 1);
+  let intCoeffs = coeffs.map(x => Math.round(x * lcmAll));
+  let min = Math.min(...intCoeffs.filter(x => x > 0));
+  if (min > 1) intCoeffs = intCoeffs.map(x => x / min);
+  return intCoeffs;
+}
+
+function balanceEquation(equationStr) {
+  let eq = parseEquation(equationStr);
+  if (!eq) return { error: 'Invalid equation format. Use e.g. H2 + O2 -> H2O' };
+  let elements = getElementList(eq);
+  let matrix = buildMatrix(eq, elements);
+  let coeffs = solveMatrix(matrix);
+  if (!coeffs || coeffs.some(isNaN)) return { error: 'Could not balance this equation.' };
+  let leftCoeffs = coeffs.slice(0, eq.left.length);
+  let rightCoeffs = coeffs.slice(eq.left.length);
+  let left = eq.left.map((c, i) => (leftCoeffs[i] > 1 ? leftCoeffs[i] : '') + c).join(' + ');
+  let right = eq.right.map((c, i) => (rightCoeffs[i] > 1 ? rightCoeffs[i] : '') + c).join(' + ');
+  let balanced = left + ' ' + eq.arrow + ' ' + right;
+  let steps = '<strong>Element count before and after:</strong><ul>';
+  elements.forEach(e => {
+    let leftSum = eq.left.reduce((sum, c, i) => sum + (parseCompound(c)[e] || 0) * leftCoeffs[i], 0);
+    let rightSum = eq.right.reduce((sum, c, i) => sum + (parseCompound(c)[e] || 0) * rightCoeffs[i], 0);
+    steps += `<li>${e}: <span style='color:#b71c1c;'>${leftSum}</span> → <span style='color:#43cea2;'>${rightSum}</span></li>`;
+  });
+  steps += '</ul>';
+  return { balanced, steps };
+}
+
+document.getElementById('balanceBtn').addEventListener('click', () => {
+  const eqInput = document.getElementById('equationInput').value.trim();
+  const resultDiv = document.getElementById('balanceResult');
+  const stepsDiv = document.getElementById('balanceSteps');
+  if (!eqInput) {
+    resultDiv.textContent = 'Please enter a chemical equation.';
+    resultDiv.style.color = '#b71c1c';
+    stepsDiv.innerHTML = '';
+    return;
+  }
+  const res = balanceEquation(eqInput);
+  if (res.error) {
+    resultDiv.textContent = res.error;
+    resultDiv.style.color = '#b71c1c';
+    stepsDiv.innerHTML = '';
+    return;
+  }
+  resultDiv.textContent = 'Balanced Equation: ' + res.balanced;
+  resultDiv.style.color = '#185a9d';
+  stepsDiv.innerHTML = res.steps;
+});
+
+// Stoichiometry Calculator JavaScript
+document.addEventListener('DOMContentLoaded', function() {
+  // Button click handlers for different calculation types
+  document.getElementById('moleMassBtn').addEventListener('click', () => {
+    hideAllSections();
+    document.getElementById('moleMassSection').style.display = 'block';
+    updateButtonStyles('moleMassBtn');
+  });
+  
+  document.getElementById('limitingReactantBtn').addEventListener('click', () => {
+    hideAllSections();
+    document.getElementById('limitingReactantSection').style.display = 'block';
+    updateButtonStyles('limitingReactantBtn');
+  });
+  
+  document.getElementById('percentYieldBtn').addEventListener('click', () => {
+    hideAllSections();
+    document.getElementById('percentYieldSection').style.display = 'block';
+    updateButtonStyles('percentYieldBtn');
+  });
+  
+  function hideAllSections() {
+    document.getElementById('moleMassSection').style.display = 'none';
+    document.getElementById('limitingReactantSection').style.display = 'none';
+    document.getElementById('percentYieldSection').style.display = 'none';
+  }
+  
+  function updateButtonStyles(activeBtnId) {
+    document.querySelectorAll('.calcTypeBtn').forEach(btn => {
+      btn.style.opacity = '0.7';
+      btn.style.transform = 'scale(0.95)';
+    });
+    document.getElementById(activeBtnId).style.opacity = '1';
+    document.getElementById(activeBtnId).style.transform = 'scale(1.05)';
+  }
+  
+  // Mole-Mass Conversion Calculator
+  document.getElementById('calculateMoleMassBtn').addEventListener('click', () => {
+    const formula = document.getElementById('moleMassFormula').value.trim();
+    const amount = parseFloat(document.getElementById('moleMassAmount').value);
+    const unit = document.getElementById('moleMassUnit').value;
+    const resultDiv = document.getElementById('moleMassResult');
+    
+    if (!formula || isNaN(amount)) {
+      resultDiv.innerHTML = '<strong>⚠️ Error:</strong> Please enter a valid formula and amount.';
+      resultDiv.style.background = '#ffebee';
+      resultDiv.style.borderLeftColor = '#f44336';
+      return;
+    }
+    
+    const molarMassResult = calculateMolarMass(formula);
+    if (molarMassResult.error) {
+      resultDiv.innerHTML = `<strong>⚠️ Error:</strong> ${molarMassResult.error}`;
+      resultDiv.style.background = '#ffebee';
+      resultDiv.style.borderLeftColor = '#f44336';
+      return;
+    }
+    
+    const molarMass = parseFloat(molarMassResult.total);
+    const avogadro = 6.022e23;
+    let results = [];
+    
+    if (unit === 'moles') {
+      const grams = amount * molarMass;
+      const particles = amount * avogadro;
+      results = [
+        `<strong>📊 Results for ${amount} moles of ${formula}:</strong>`,
+        `• <strong>Mass:</strong> ${grams.toFixed(3)} g`,
+        `• <strong>Particles:</strong> ${particles.toExponential(3)} molecules/atoms`
+      ];
+    } else if (unit === 'grams') {
+      const moles = amount / molarMass;
+      const particles = moles * avogadro;
+      results = [
+        `<strong>📊 Results for ${amount} g of ${formula}:</strong>`,
+        `• <strong>Moles:</strong> ${moles.toFixed(6)} mol`,
+        `• <strong>Particles:</strong> ${particles.toExponential(3)} molecules/atoms`
+      ];
+    } else if (unit === 'particles') {
+      const moles = amount / avogadro;
+      const grams = moles * molarMass;
+      results = [
+        `<strong>📊 Results for ${amount.toExponential(3)} particles of ${formula}:</strong>`,
+        `• <strong>Moles:</strong> ${moles.toFixed(6)} mol`,
+        `• <strong>Mass:</strong> ${grams.toFixed(3)} g`
+      ];
+    }
+    
+    resultDiv.innerHTML = results.join('<br>');
+    resultDiv.style.background = '#e8f5e8';
+    resultDiv.style.borderLeftColor = '#4caf50';
+  });
+  
+  // Limiting Reactant Calculator
+  document.getElementById('calculateLimitingBtn').addEventListener('click', () => {
+    const equation = document.getElementById('limitingEquation').value.trim();
+    const reactant1 = document.getElementById('reactant1').value.trim();
+    const amount1 = parseFloat(document.getElementById('amount1').value);
+    const reactant2 = document.getElementById('reactant2').value.trim();
+    const amount2 = parseFloat(document.getElementById('amount2').value);
+    const resultDiv = document.getElementById('limitingResult');
+    
+    if (!equation || !reactant1 || !reactant2 || isNaN(amount1) || isNaN(amount2)) {
+      resultDiv.innerHTML = '<strong>⚠️ Error:</strong> Please fill in all fields with valid values.';
+      resultDiv.style.background = '#ffebee';
+      resultDiv.style.borderLeftColor = '#f44336';
+      return;
+    }
+    
+    // Parse the balanced equation to get coefficients
+    const parsed = parseEquation(equation);
+    if (!parsed) {
+      resultDiv.innerHTML = '<strong>⚠️ Error:</strong> Invalid equation format. Use e.g. 2H2 + O2 -> 2H2O';
+      resultDiv.style.background = '#ffebee';
+      resultDiv.style.borderLeftColor = '#f44336';
+      return;
+    }
+    
+    // Find coefficients for the reactants
+    const leftCompounds = parsed.left;
+    let coeff1 = 1, coeff2 = 1;
+    
+    for (let i = 0; i < leftCompounds.length; i++) {
+      const compound = leftCompounds[i].replace(/^\d+/, ''); // Remove coefficient
+      if (compound === reactant1) {
+        coeff1 = parseInt(leftCompounds[i].match(/^\d+/)?.[0] || 1);
+      } else if (compound === reactant2) {
+        coeff2 = parseInt(leftCompounds[i].match(/^\d+/)?.[0] || 1);
+      }
+    }
+    
+    // Calculate molar masses
+    const molarMass1 = parseFloat(calculateMolarMass(reactant1).total);
+    const molarMass2 = parseFloat(calculateMolarMass(reactant2).total);
+    
+    // Calculate moles
+    const moles1 = amount1 / molarMass1;
+    const moles2 = amount2 / molarMass2;
+    
+    // Calculate stoichiometric ratios
+    const ratio1 = moles1 / coeff1;
+    const ratio2 = moles2 / coeff2;
+    
+    let limitingReactant, excessReactant, theoreticalYield;
+    
+    if (ratio1 < ratio2) {
+      limitingReactant = reactant1;
+      excessReactant = reactant2;
+      theoreticalYield = ratio1 * coeff1; // moles of product
+    } else {
+      limitingReactant = reactant2;
+      excessReactant = reactant1;
+      theoreticalYield = ratio2 * coeff2; // moles of product
+    }
+    
+    // Find product formula for yield calculation
+    const productFormula = parsed.right[0].replace(/^\d+/, '');
+    const productMolarMass = parseFloat(calculateMolarMass(productFormula).total);
+    const theoreticalYieldGrams = theoreticalYield * productMolarMass;
+    
+    const results = [
+      `<strong>🔬 Limiting Reactant Analysis:</strong>`,
+      `• <strong>Limiting Reactant:</strong> ${limitingReactant} (runs out first)`,
+      `• <strong>Excess Reactant:</strong> ${excessReactant} (left over)`,
+      `• <strong>Theoretical Yield:</strong> ${theoreticalYield.toFixed(4)} mol (${theoreticalYieldGrams.toFixed(3)} g) of ${productFormula}`,
+      `<br><strong>📊 Calculations:</strong>`,
+      `• ${reactant1}: ${amount1} g ÷ ${molarMass1} g/mol = ${moles1.toFixed(4)} mol`,
+      `• ${reactant2}: ${amount2} g ÷ ${molarMass2} g/mol = ${moles2.toFixed(4)} mol`,
+      `• Stoichiometric ratio ${reactant1}: ${ratio1.toFixed(4)} vs ${reactant2}: ${ratio2.toFixed(4)}`
+    ];
+    
+    resultDiv.innerHTML = results.join('<br>');
+    resultDiv.style.background = '#fff3e0';
+    resultDiv.style.borderLeftColor = '#ff9800';
+  });
+  
+  // Percent Yield Calculator
+  document.getElementById('calculateYieldBtn').addEventListener('click', () => {
+    const theoretical = parseFloat(document.getElementById('theoreticalYield').value);
+    const actual = parseFloat(document.getElementById('actualYield').value);
+    const resultDiv = document.getElementById('yieldResult');
+    
+    if (isNaN(theoretical) || isNaN(actual)) {
+      resultDiv.innerHTML = '<strong>⚠️ Error:</strong> Please enter valid numerical values.';
+      resultDiv.style.background = '#ffebee';
+      resultDiv.style.borderLeftColor = '#f44336';
+      return;
+    }
+    
+    if (theoretical <= 0) {
+      resultDiv.innerHTML = '<strong>⚠️ Error:</strong> Theoretical yield must be greater than zero.';
+      resultDiv.style.background = '#ffebee';
+      resultDiv.style.borderLeftColor = '#f44336';
+      return;
+    }
+    
+    const percentYield = (actual / theoretical) * 100;
+    
+    let yieldCategory, yieldColor;
+    if (percentYield >= 90) {
+      yieldCategory = 'Excellent';
+      yieldColor = '#27ae60';
+    } else if (percentYield >= 80) {
+      yieldCategory = 'Good';
+      yieldColor = '#f39c12';
+    } else if (percentYield >= 70) {
+      yieldCategory = 'Fair';
+      yieldColor = '#e67e22';
+    } else {
+      yieldCategory = 'Poor';
+      yieldColor = '#e74c3c';
+    }
+    
+    const results = [
+      `<strong>📈 Percent Yield Calculation:</strong>`,
+      `• <strong>Percent Yield:</strong> <span style="color:${yieldColor}; font-weight:bold;">${percentYield.toFixed(2)}%</span>`,
+      `• <strong>Yield Category:</strong> <span style="color:${yieldColor}; font-weight:bold;">${yieldCategory}</span>`,
+      `<br><strong>📊 Formula:</strong>`,
+      `• Percent Yield = (Actual Yield ÷ Theoretical Yield) × 100`,
+      `• Percent Yield = (${actual} g ÷ ${theoretical} g) × 100 = ${percentYield.toFixed(2)}%`
+    ];
+    
+    resultDiv.innerHTML = results.join('<br>');
+    resultDiv.style.background = '#e8f5e8';
+    resultDiv.style.borderLeftColor = '#4caf50';
+  });
+});
+
+// Chemistry Reference Guide Data
+const referenceData = {
+  polyatomicIons: [
+    { name: 'Acetate', formula: 'C₂H₃O₂⁻', charge: '-1' },
+    { name: 'Ammonium', formula: 'NH₄⁺', charge: '+1' },
+    { name: 'Carbonate', formula: 'CO₃²⁻', charge: '-2' },
+    { name: 'Chlorate', formula: 'ClO₃⁻', charge: '-1' },
+    { name: 'Chlorite', formula: 'ClO₂⁻', charge: '-1' },
+    { name: 'Chromate', formula: 'CrO₄²⁻', charge: '-2' },
+    { name: 'Cyanide', formula: 'CN⁻', charge: '-1' },
+    { name: 'Dichromate', formula: 'Cr₂O₇²⁻', charge: '-2' },
+    { name: 'Dihydrogen Phosphate', formula: 'H₂PO₄⁻', charge: '-1' },
+    { name: 'Hydrogen Carbonate', formula: 'HCO₃⁻', charge: '-1' },
+    { name: 'Hydrogen Phosphate', formula: 'HPO₄²⁻', charge: '-2' },
+    { name: 'Hydrogen Sulfate', formula: 'HSO₄⁻', charge: '-1' },
+    { name: 'Hydroxide', formula: 'OH⁻', charge: '-1' },
+    { name: 'Hypochlorite', formula: 'ClO⁻', charge: '-1' },
+    { name: 'Nitrate', formula: 'NO₃⁻', charge: '-1' },
+    { name: 'Nitrite', formula: 'NO₂⁻', charge: '-1' },
+    { name: 'Perchlorate', formula: 'ClO₄⁻', charge: '-1' },
+    { name: 'Permanganate', formula: 'MnO₄⁻', charge: '-1' },
+    { name: 'Peroxide', formula: 'O₂²⁻', charge: '-2' },
+    { name: 'Phosphate', formula: 'PO₄³⁻', charge: '-3' },
+    { name: 'Sulfate', formula: 'SO₄²⁻', charge: '-2' },
+    { name: 'Sulfite', formula: 'SO₃²⁻', charge: '-2' },
+    { name: 'Thiocyanate', formula: 'SCN⁻', charge: '-1' }
+  ],
+  
+  solubilityRules: [
+    { rule: 'All Group 1 (Li⁺, Na⁺, K⁺, Rb⁺, Cs⁺) compounds', solubility: 'Soluble' },
+    { rule: 'All NH₄⁺ compounds', solubility: 'Soluble' },
+    { rule: 'All NO₃⁻ compounds', solubility: 'Soluble' },
+    { rule: 'All Cl⁻, Br⁻, I⁻ compounds', solubility: 'Soluble (except Ag⁺, Hg₂²⁺, Pb²⁺)' },
+    { rule: 'All SO₄²⁻ compounds', solubility: 'Soluble (except Ba²⁺, Sr²⁺, Pb²⁺, Ca²⁺)' },
+    { rule: 'All CO₃²⁻, PO₄³⁻, S²⁻ compounds', solubility: 'Insoluble (except Group 1, NH₄⁺)' },
+    { rule: 'All OH⁻ compounds', solubility: 'Insoluble (except Group 1, Ba²⁺, Sr²⁺, Ca²⁺)' }
+  ],
+  
+  oxidationStates: [
+    { element: 'Group 1 (Li, Na, K, Rb, Cs)', state: '+1' },
+    { element: 'Group 2 (Be, Mg, Ca, Sr, Ba)', state: '+2' },
+    { element: 'Group 13 (B, Al, Ga, In, Tl)', state: '+3' },
+    { element: 'Group 14 (C, Si, Ge, Sn, Pb)', state: '+4, +2' },
+    { element: 'Group 15 (N, P, As, Sb, Bi)', state: '+5, +3, -3' },
+    { element: 'Group 16 (O, S, Se, Te)', state: '-2, +4, +6' },
+    { element: 'Group 17 (F, Cl, Br, I)', state: '-1, +1, +3, +5, +7' },
+    { element: 'Group 18 (He, Ne, Ar, Kr, Xe)', state: '0' },
+    { element: 'Transition Metals', state: 'Variable (+1 to +7)' },
+    { element: 'Hydrogen', state: '+1, -1' },
+    { element: 'Oxygen', state: '-2 (except in peroxides: -1)' },
+    { element: 'Fluorine', state: '-1' }
+  ],
+  
+  acidBaseIndicators: [
+    { name: 'Phenolphthalein', pHRange: '8.3-10.0', colorChange: 'Colorless to Pink' },
+    { name: 'Methyl Orange', pHRange: '3.1-4.4', colorChange: 'Red to Yellow' },
+    { name: 'Bromothymol Blue', pHRange: '6.0-7.6', colorChange: 'Yellow to Blue' },
+    { name: 'Litmus', pHRange: '5.0-8.0', colorChange: 'Red to Blue' },
+    { name: 'Universal Indicator', pHRange: '1-14', colorChange: 'Red to Purple' },
+    { name: 'Methyl Red', pHRange: '4.4-6.2', colorChange: 'Red to Yellow' },
+    { name: 'Thymol Blue', pHRange: '1.2-2.8, 8.0-9.6', colorChange: 'Red-Yellow, Yellow-Blue' }
+  ],
+  
+  labEquipment: [
+    { name: 'Beaker', use: 'Mixing, heating, storing liquids', material: 'Glass/Plastic' },
+    { name: 'Erlenmeyer Flask', use: 'Titrations, reactions, culturing', material: 'Glass' },
+    { name: 'Volumetric Flask', use: 'Precise volume measurements', material: 'Glass' },
+    { name: 'Graduated Cylinder', use: 'Volume measurements', material: 'Glass/Plastic' },
+    { name: 'Buret', use: 'Titrations, precise liquid dispensing', material: 'Glass' },
+    { name: 'Pipet', use: 'Transferring precise volumes', material: 'Glass' },
+    { name: 'Test Tube', use: 'Small reactions, heating', material: 'Glass' },
+    { name: 'Watch Glass', use: 'Covering beakers, evaporating', material: 'Glass' },
+    { name: 'Crucible', use: 'High-temperature reactions', material: 'Porcelain' },
+    { name: 'Bunsen Burner', use: 'Heating, flame tests', material: 'Metal' },
+    { name: 'Balance', use: 'Mass measurements', material: 'Electronic/Mechanical' },
+    { name: 'pH Meter', use: 'pH measurements', material: 'Electronic' }
+  ]
+};
+
+// Initialize Reference Guide
+document.addEventListener('DOMContentLoaded', function() {
+  // Reference Guide functionality
+  const referenceTabs = document.querySelectorAll('.referenceTab');
+  const referenceContent = document.querySelectorAll('.referenceContent');
+  
+  referenceTabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      // Remove active class from all tabs and content
+      referenceTabs.forEach(t => t.classList.remove('active'));
+      referenceContent.forEach(c => c.style.display = 'none');
+      
+      // Add active class to clicked tab and show content
+      tab.classList.add('active');
+      const targetId = tab.getAttribute('data-target');
+      document.getElementById(targetId).style.display = 'block';
+    });
+  });
+  
+  // Populate reference data
+  populateReferenceData();
+});
+
+function populateReferenceData() {
+  // Populate Polyatomic Ions
+  const ionsContainer = document.getElementById('polyatomicIonsList');
+  if (ionsContainer) {
+    ionsContainer.innerHTML = referenceData.polyatomicIons.map(ion => 
+      `<div class="reference-item">
+        <strong>${ion.name}:</strong> ${ion.formula} (${ion.charge})
+      </div>`
+    ).join('');
+  }
+  
+  // Populate Solubility Rules
+  const solubilityContainer = document.getElementById('solubilityRulesList');
+  if (solubilityContainer) {
+    solubilityContainer.innerHTML = referenceData.solubilityRules.map(rule => 
+      `<div class="reference-item">
+        <strong>${rule.rule}:</strong> ${rule.solubility}
+      </div>`
+    ).join('');
+  }
+  
+  // Populate Oxidation States
+  const oxidationContainer = document.getElementById('oxidationStatesList');
+  if (oxidationContainer) {
+    oxidationContainer.innerHTML = referenceData.oxidationStates.map(state => 
+      `<div class="reference-item">
+        <strong>${state.element}:</strong> ${state.state}
+      </div>`
+    ).join('');
+  }
+  
+  // Populate Acid-Base Indicators
+  const indicatorsContainer = document.getElementById('acidBaseIndicatorsList');
+  if (indicatorsContainer) {
+    indicatorsContainer.innerHTML = referenceData.acidBaseIndicators.map(indicator => 
+      `<div class="reference-item">
+        <strong>${indicator.name}:</strong> pH ${indicator.pHRange} (${indicator.colorChange})
+      </div>`
+    ).join('');
+  }
+  
+  // Populate Lab Equipment
+  const equipmentContainer = document.getElementById('labEquipmentList');
+  if (equipmentContainer) {
+    equipmentContainer.innerHTML = referenceData.labEquipment.map(equipment => 
+      `<div class="reference-item">
+        <strong>${equipment.name}:</strong> ${equipment.use} (${equipment.material})
+      </div>`
+    ).join('');
+  }
+}
+</script>
+</body>
+</html>
+
